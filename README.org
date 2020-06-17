@@ -56,14 +56,8 @@ sudo zeek -i <enth> <hardnedlinux-zeek-script>/scirpts/local.zeek
 #+CAPTION: test
 #+ATTR_ORG: :width 500
 #+ATTR_LATEX: :width 5in
-[[file:img/index-topics.png]]
-
-#+NAME: Topics
-#+CAPTION:
-#+ATTR_ORG: :width 500
-#+ATTR_LATEX: :width 5in
-[[file:img/topics.png]]
-
+[[file:img/index.png]]
+- Kafka's Zeek config files for Logstash [[https://github.com/hardenedlinux/debian-nix-manager/tree/master/elk/zeek-logstash][zeek-logstash]]
 * CHANGES
  taking test with zeek -i ens
 
@@ -71,18 +65,7 @@ sudo zeek -i <enth> <hardnedlinux-zeek-script>/scirpts/local.zeek
 sudo zeek -i enp1s0 -C ~/project/hardenedlinux-zeek-script/scripts/local.zeek
  #+end_src
 
-- using nix env do zeek quickly. more information: https://github.com/hardenedlinux/NSM-data-analysis
-
-
-#+begin_src sh :async t :exports both :results output
- cd NSM-data-analysis/
- mkdir -p zeek-log
- cd zeek-log
- sudo ../result/bin/zeek -i eno1 ../../scripts/local.zeek
-#+end_src
-
 - Quickly start with zkg
-
 
 #+begin_src sh :tangle yes
     sudo pip install bro-pkg

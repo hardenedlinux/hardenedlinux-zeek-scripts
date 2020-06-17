@@ -162,7 +162,7 @@ Log::add_filter(X509::LOG, filter_x509 );
 local filter_ssl: Log::Filter = [
     $name = "kafka_ssl",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-ssl"
+    $path = "ssl"
 ];
 Log::add_filter(SSL::LOG, filter_ssl );
 ##ssh-status
