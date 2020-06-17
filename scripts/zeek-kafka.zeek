@@ -30,14 +30,14 @@ event zeek_init() &priority=-10
 local filter_virus_total: Log::Filter = [
   $name = "virustotal",
   $writer = Log::WRITER_KAFKAWRITER,
-  $path = "zeek-virustotal"
+  $path = "virustotal"
 ];
 Log::add_filter (VirusTotal::LOG, filter_virus_total);
 # Known::hash
 local filter_known_hash: Log::Filter = [
   $name = "known_hash",
   $writer = Log::WRITER_KAFKAWRITER,
-  $path = "zeek-known_hash"
+  $path = "known_hash"
 ];
 Log::add_filter (Known::HASH_LOG, filter_known_hash);
 
@@ -45,7 +45,7 @@ Log::add_filter (Known::HASH_LOG, filter_known_hash);
 local filter_known_hosts: Log::Filter = [
     $name = "known_hosts",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-known_hosts"
+    $path = "known_hosts"
 ];
 Log::add_filter (Known::HOSTS_LOG, filter_known_hosts);
 
@@ -53,7 +53,7 @@ Log::add_filter (Known::HOSTS_LOG, filter_known_hosts);
 local filter_known_domains: Log::Filter = [
     $name = "known_domains",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-known_domains"
+    $path = "known_domains"
 ];
 Log::add_filter (Known::DOMAIN_LOG, filter_known_domains);
 
@@ -61,14 +61,14 @@ Log::add_filter (Known::DOMAIN_LOG, filter_known_domains);
 local filter_smb_mapping: Log::Filter = [
     $name = "filter_smb_mapping",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-smb_mapping"
+    $path = "smb_mapping"
 ];
 Log::add_filter(SMB::MAPPING_LOG, filter_smb_mapping);
 #smb_files
 local filter_smb_files: Log::Filter = [
     $name = "filter_smb_files",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-smb_files"
+    $path = "smb_files"
 ];
 Log::add_filter(SMB::FILES_LOG, filter_smb_files );
 
@@ -76,7 +76,7 @@ Log::add_filter(SMB::FILES_LOG, filter_smb_files );
 local kafka_files: Log::Filter = [
     $name = "kafka_files",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-files"
+    $path = "files"
 ];
 Log::add_filter(Files::LOG, kafka_files);
 
@@ -85,91 +85,91 @@ Log::add_filter(Files::LOG, kafka_files);
 local filter_files: Log::Filter = [
     $name = "filter_files",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-files_identified"
+    $path = "files_identified"
 ];
 Log::add_filter(Files::LOG, filter_files );
 #known_services
 local filter_known_services: Log::Filter = [
     $name = "filter_known_services",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-known_services"
+    $path = "known_services"
 ];
 Log::add_filter(Known::SERVICES_LOG, filter_known_services );
 #SOCKS
 local filter_socks: Log::Filter = [
     $name = "kafka-socks",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-socks"
+    $path = "socks"
 ];
 Log::add_filter(SOCKS::LOG, filter_socks );
 #	SNMP
 local filter_SNMP: Log::Filter = [
     $name = "kafka_snmp",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-snmp"
+    $path = "snmp"
 ];
 Log::add_filter(SNMP::LOG, filter_SNMP );
 #DNP3
 local filter_dnp3: Log::Filter = [
     $name = "dnp3",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-dnp3"
+    $path = "dnp3"
 ];
 Log::add_filter(DNP3::LOG, filter_dnp3 );
 #FTP
 local filter_FTP: Log::Filter = [
     $name = "kafka-ftp",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-ftp"
+    $path = "ftp"
 ];
 Log::add_filter(FTP::LOG, filter_FTP );
 #MySQL
 local filter_mysql: Log::Filter = [
     $name = "kafka-mysql",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-mysql"
+    $path = "mysql"
 ];
 Log::add_filter(mysql::LOG,filter_mysql );
 #Status
 local filter_stats: Log::Filter = [
     $name = "kafka-status",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-stats"
+    $path = "stats"
 ];
 Log::add_filter(Stats::LOG, filter_stats );
 #Broker
 local filter_broker: Log::Filter = [
     $name = "broker",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-broker"
+    $path = "broker"
 ];
 Log::add_filter(Broker::LOG, filter_broker );
 #intel
 local filter_intel: Log::Filter = [
     $name = "kafka-intel",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-intel"
+    $path = "intel"
 ];
 Log::add_filter(Intel::LOG, filter_intel);
 ##x509
 local filter_x509: Log::Filter = [
     $name = "kafka-x509",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-x509"
+    $path = "x509"
 ];
 Log::add_filter(X509::LOG, filter_x509 );
 ##ssl
 local filter_ssl: Log::Filter = [
     $name = "kafka_ssl",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-zeek-ssl"
+    $path = "zeek-ssl"
 ];
 Log::add_filter(SSL::LOG, filter_ssl );
 ##ssh-status
 local filter_ssh: Log::Filter = [
     $name = "ssh-status",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-auth_ssh"
+    $path = "auth_ssh"
 ];
 Log::add_filter(HSSH::LOG, filter_ssh );
 ##Hash-fuzzing
@@ -177,7 +177,7 @@ Log::add_filter(HSSH::LOG, filter_ssh );
 local filter_top_dns: Log::Filter = [
     $name = "top-dns",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-top_dns"
+    $path = "top_dns"
 ];
 Log::add_filter(TopDNS::LOG,filter_top_dns );
 
@@ -185,7 +185,7 @@ Log::add_filter(TopDNS::LOG,filter_top_dns );
 local filter_mqtt_subscribe : Log::Filter = [
     $name = "mqtt_subscribe",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-mqtt_subscribe"
+    $path = "mqtt_subscribe"
 ];
 Log::add_filter(MQTT::SUBSCRIBE_LOG, filter_mqtt_subscribe);
 
@@ -193,7 +193,7 @@ Log::add_filter(MQTT::SUBSCRIBE_LOG, filter_mqtt_subscribe);
 local filter_mqtt_publish : Log::Filter = [
     $name = "mqtt_publish",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-mqtt_publish"
+    $path = "mqtt_publish"
 ];
 Log::add_filter(MQTT::PUBLISH_LOG, filter_mqtt_publish);
 
@@ -201,7 +201,7 @@ Log::add_filter(MQTT::PUBLISH_LOG, filter_mqtt_publish);
 local filter_mqtt_connect : Log::Filter = [
     $name = "mqtt_connect",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-mqtt_connect"
+    $path = "mqtt_connect"
 ];
 Log::add_filter(MQTT::CONNECT_LOG, filter_mqtt_connect);
 
@@ -209,7 +209,7 @@ Log::add_filter(MQTT::CONNECT_LOG, filter_mqtt_connect);
 local filter_http2: Log::Filter = [
     $name = "http2",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-http2"
+    $path = "http2"
 ];
 Log::add_filter(HTTP2::LOG, filter_http2 );
 
@@ -218,7 +218,7 @@ Log::add_filter(HTTP2::LOG, filter_http2 );
 # local protocols_resp: Log::Filter = [
 #     $name = "protocols-resp",
 #     $writer = Log::WRITER_KAFKAWRITER,
-#     $path = "zeek-protocols-resp"
+#     $path = "protocols-resp"
 # ];
 # Log::add_filter(ProtocolStats::RESP, protocols_resp);
 
@@ -226,7 +226,7 @@ Log::add_filter(HTTP2::LOG, filter_http2 );
 # local protocols_orig: Log::Filter = [
 #     $name = "protocols-o",
 #     $writer = Log::WRITER_KAFKAWRITER,
-#     $path = "zeek-protocols-orig"
+#     $path = "protocols-orig"
 # ];
 # Log::add_filter(ProtocolStats::ORIG, protocols_orig);
 
@@ -234,7 +234,7 @@ Log::add_filter(HTTP2::LOG, filter_http2 );
 local resp_summary: Log::Filter = [
     $name = "resp-summary",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-resp-summary"
+    $path = "resp-summary"
 ];
 Log::add_filter(RespTrafficSummary::LOG, resp_summary);
 
@@ -243,7 +243,7 @@ Log::add_filter(RespTrafficSummary::LOG, resp_summary);
 local ssl_ciphers: Log::Filter = [
     $name = "ssl-ciphers",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-ssl-ciphers"
+    $path = "ssl-ciphers"
 ];
 Log::add_filter(SSLCiphers::LOG, ssl_ciphers );
 
@@ -251,14 +251,14 @@ Log::add_filter(SSLCiphers::LOG, ssl_ciphers );
 local conn_macs: Log::Filter = [
     $name = "conn_macs",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-unique-macs"
+    $path = "unique-macs"
 ];
 Log::add_filter(UniqueMacs::LOG,conn_macs );
 # handles HTTP
 local http_filter: Log::Filter = [
     $name = "kafka-http",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-http"
+    $path = "http"
 ];
 Log::add_filter(HTTP::LOG, http_filter);
 
@@ -266,7 +266,7 @@ Log::add_filter(HTTP::LOG, http_filter);
 local software_filter: Log::Filter = [
     $name = "kafka-software",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-software"
+    $path = "software"
 ];
 Log::add_filter(Software::LOG, software_filter);
 
@@ -274,7 +274,7 @@ Log::add_filter(Software::LOG, software_filter);
 local smtp_filter: Log::Filter = [
     $name = "kafka-smtp",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-smtp"
+    $path = "smtp"
 ];
 Log::add_filter(SMTP::LOG,smtp_filter );
 
@@ -282,7 +282,7 @@ Log::add_filter(SMTP::LOG,smtp_filter );
 local irc_filter: Log::Filter = [
     $name = "kafka-irc",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-irc"
+    $path = "irc"
 ];
 Log::add_filter(IRC::LOG, irc_filter );
 
@@ -290,14 +290,14 @@ Log::add_filter(IRC::LOG, irc_filter );
 local pe_filter: Log::Filter = [
     $name = "kafka-pe",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-pe"
+    $path = "pe"
 ];
 Log::add_filter(PE::LOG, pe_filter );
 #handles dhcp
 local dhcp_filter: Log::Filter = [
     $name = "kafka-dhcp",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-dhcp"
+    $path = "dhcp"
 ];
 Log::add_filter(DHCP::LOG, dhcp_filter);
 
@@ -305,7 +305,7 @@ Log::add_filter(DHCP::LOG, dhcp_filter);
 local ssh_filter: Log::Filter = [
     $name = "kafka-ssh",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-ssh"
+    $path = "ssh"
 ];
 Log::add_filter(SSH::LOG, ssh_filter );
 
@@ -313,7 +313,7 @@ Log::add_filter(SSH::LOG, ssh_filter );
 local Conn_filter: Log::Filter = [
     $name = "kafka-conn",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-conn"
+    $path = "conn"
 ];
 Log::add_filter(Conn::LOG, Conn_filter );
 
@@ -321,7 +321,7 @@ Log::add_filter(Conn::LOG, Conn_filter );
 local Notice_filter: Log::Filter = [
     $name = "kafka-Notice",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-notice"
+    $path = "notice"
 ];
 Log::add_filter(Notice::LOG, Notice_filter);
 
@@ -329,7 +329,7 @@ Log::add_filter(Notice::LOG, Notice_filter);
 local dns_filter: Log::Filter = [
     $name = "kafka-dns",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-dns"
+    $path = "dns"
 ];
 Log::add_filter(DNS::LOG, dns_filter);
 
@@ -338,7 +338,7 @@ Log::add_filter(DNS::LOG, dns_filter);
 local conn_top_urls: Log::Filter = [
     $name = "conn_top_urls",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-top_urls"
+    $path = "top_urls"
 ];
 Log::add_filter(TopMetrics::URLS, conn_top_urls);
 
@@ -346,7 +346,7 @@ Log::add_filter(TopMetrics::URLS, conn_top_urls);
 local conn_top_talkers: Log::Filter = [
     $name = "conn_top_talkers",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-top_talkers"
+    $path = "top_talkers"
 ];
 Log::add_filter(TopMetrics::TALKERS, conn_top_talkers);
 
@@ -354,7 +354,7 @@ Log::add_filter(TopMetrics::TALKERS, conn_top_talkers);
 local conn_host: Log::Filter = [
     $name = "conn_host",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-unique-host"
+    $path = "unique-host"
 ];
 Log::add_filter(UniqueHosts::LOG, conn_host);
 
@@ -363,7 +363,7 @@ Log::add_filter(UniqueHosts::LOG, conn_host);
 local kafka_ntlm: Log::Filter = [
     $name = "kafka_ntml",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-ntml"
+    $path = "ntml"
 ];
 Log::add_filter(NTLM::LOG, kafka_ntlm);
 
@@ -374,7 +374,7 @@ Log::add_filter(NTLM::LOG, kafka_ntlm);
 local kafka_ntp: Log::Filter = [
     $name = "kafka_ntp",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-ntp"
+    $path = "ntp"
 ];
 Log::add_filter(NTP::LOG, kafka_ntp);
 
@@ -385,7 +385,7 @@ Log::add_filter(NTP::LOG, kafka_ntp);
 local kafka_dpd: Log::Filter = [
     $name = "kafka_dpd",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-dpd"
+    $path = "dpd"
 ];
 Log::add_filter(DPD::LOG, kafka_dpd);
 
@@ -394,7 +394,7 @@ Log::add_filter(DPD::LOG, kafka_dpd);
 local kafka_weird: Log::Filter = [
     $name = "kafka_weird",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-werid"
+    $path = "werid"
 ];
 Log::add_filter(Weird::LOG, kafka_weird);
 
@@ -404,7 +404,7 @@ Log::add_filter(Weird::LOG, kafka_weird);
 local kafka_reporter: Log::Filter = [
     $name = "kafka_reporter",
     $writer = Log::WRITER_KAFKAWRITER,
-    $path = "zeek-reporter"
+    $path = "reporter"
 ];
 Log::add_filter(Reporter::LOG, kafka_reporter);
 }
