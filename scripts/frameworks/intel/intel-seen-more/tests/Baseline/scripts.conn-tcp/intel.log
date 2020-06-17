@@ -1,0 +1,20 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	intel
+#open	2018-01-26-17-12-15
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	seen.indicator	seen.indicator_type	seen.where	seen.node	matched	sources	fuid	file_mime_type	file_desc
+#types	time	string	addr	port	addr	port	string	enum	enum	string	set[enum]	set[string]	string	string	string
+1300475168.783842	CUM0KZ3MLUfNB0cl11	141.142.220.118	48649	208.80.152.118	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.915940	CwjjYJ2WqgTbAqiHl6	141.142.220.118	49997	208.80.152.3	80	141.142.220.118:49997	Intel::CONN_TCP	Conn::IN_ORIG	bro	Intel::CONN_TCP	source1	-	-	-
+1300475168.915940	CwjjYJ2WqgTbAqiHl6	141.142.220.118	49997	208.80.152.3	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.916118	C3eiCBGOLw3VtHfOj	141.142.220.118	49996	208.80.152.3	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.918295	Ck51lg1bScffFj34Ri	141.142.220.118	49998	208.80.152.3	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.952193	CtxTCR2Yer0FR1tIBg	141.142.220.118	50000	208.80.152.3	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.952228	CykQaM33ztNt0csB9a	141.142.220.118	49999	208.80.152.3	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.954761	CLNN1k2QMum1aexUK7	141.142.220.118	50001	208.80.152.3	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.962628	CiyBAq1bBLNaTiTAc	141.142.220.118	35642	208.80.152.2	80	208.80.152.2:80	Intel::CONN_TCP	Conn::IN_RESP	bro	Intel::CONN_TCP	source1	-	-	-
+1300475168.962628	CiyBAq1bBLNaTiTAc	141.142.220.118	35642	208.80.152.2	80	141.142.220.118	Intel::ADDR	Conn::IN_ORIG	bro	Intel::ADDR	source1	-	-	-
+1300475168.962628	CiyBAq1bBLNaTiTAc	141.142.220.118	35642	208.80.152.2	80	208.80.152.2	Intel::ADDR	Conn::IN_RESP	bro	Intel::ADDR	source1	-	-	-
+#close	2018-01-26-17-12-15

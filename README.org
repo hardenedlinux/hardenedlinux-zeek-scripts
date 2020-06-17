@@ -1,0 +1,212 @@
+#+AUTHOR: GTrunSec
+#+EMAIL: gtrunsec@hardenedlinux.org
+#+DATE: 10 August 2019
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en cn
+#+SETUPFILE: ~/org-notes/setup/darkcss.local
+#+hugo_publishdate: (0 5)
+#+hugo_auto_set_lastmod: t
+#+HUGO_categories: 
+#+HUGO_tags: 
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+* Buding Zeek with Nix package manager
+** Building Zeek's binary by nix package manager
+#+begin_src sh :async t :exports both :results output
+git clone https://github.com/hardenedlinux/nixpkgs-hardenedlinux
+nix-build nixpkgs-hardenedlinux/test/zeek.nix
+#+end_src
+
+** Using Zeek's binary  via hardenedlinux binary cache machines(Speed up)
+#+begin_src sh :async t :exports both :results output
+git clone https://github.com/hardenedlinux/nixpkgs-hardenedlinux
+nix-build nixpkgs-hardenedlinux/test/zeek.nix --option substituters "https://cache.nixos.org http://221.4.35.244:8301" --option trusted-public-keys "221.4.35.2
+44:3ehdeUIC5gWzY+I7iF3lrpmxOMyEZQbZlcjOmlOVpeo="                                                                                         
+these derivations will be built:                                                                                                 /nix/store/z0wbd0vgrv5dddxswrw1v3qdx7g1yrbi-nsm-zeek.drv                                                                               
+these paths will be fetched (0.00 MiB download, 37.78 MiB unpacked):                                                                     
+  /nix/store/3i9f2f5rklrw4x0rafs8l440h7qs8r8i-zeek-3.0.6                                                                                 
+copying path '/nix/store/3i9f2f5rklrw4x0rafs8l440h7qs8r8i-zeek-3.0.6' from 'http://221.4.35.244:8301'...                                 
+building '/nix/store/z0wbd0vgrv5dddxswrw1v3qdx7g1yrbi-nsm-zeek.drv'...                                                                   
+created 7 symlinks in user environment                                                                                                   
+/nix/store/pr41149ralbb71abdny78dnlzaaj789n-nsm-zeek 
+#+end_src
+
+* Deploy Zeek kafka topics with Nix home-manager on Debian(OS)
+- get more information: https://github.com/hardenedlinux/debian-nix-manager
+
+
+#+begin_src sh :async t :exports both :results output
+home-manager switch
+deploy-home-manager -s ## to start each service of NSM status
+deploy-home-manager -c ## to check each service of NSM status
+#+end_src
+
+- Then Zeekctl deploy Zeek's cluster
+
+
+or Do a kafka topics test.
+
+#+BEGIN_EXAMPLE
+sudo zeek -i <enth> <hardnedlinux-zeek-script>/scirpts/local.zeek
+#+END_EXAMPLE
+
+#+NAME: topics
+#+CAPTION: test
+#+ATTR_ORG: :width 500
+#+ATTR_LATEX: :width 5in
+[[file:img/index-topics.png]]
+
+#+NAME: Topics
+#+CAPTION:
+#+ATTR_ORG: :width 500
+#+ATTR_LATEX: :width 5in
+[[file:img/topics.png]]
+
+* CHANGES
+ taking test with zeek -i ens
+
+ #+begin_src sh :async t :exports both :results output
+sudo zeek -i enp1s0 -C ~/project/hardenedlinux-zeek-script/scripts/local.zeek
+ #+end_src
+
+- using nix env do zeek quickly. more information: https://github.com/hardenedlinux/NSM-data-analysis
+
+
+#+begin_src sh :async t :exports both :results output
+ cd NSM-data-analysis/
+ mkdir -p zeek-log
+ cd zeek-log
+ sudo ../result/bin/zeek -i eno1 ../../scripts/local.zeek
+#+end_src
+
+- Quickly start with zkg
+
+
+#+begin_src sh :tangle yes
+    sudo pip install bro-pkg
+    ##zeek installation is owned by "root" user that was stored in /root/.bro-pkg
+    sudo zkg autoconfig
+    sudo zkg config script_dir
+    sudo zkg config plugin_dir
+    sudo zkg install https://github.com/hardenedlinux/hardenedlinux-zeek-script
+
+echo '@load packages' | sudo tee --append /usr/local/zeek/share/zeek/site/local.zeek
+
+#or @load packages/hardenedlinux-zeek-script
+sudo zeekctl deploy
+
+
+#+end_src
+
+- TEST Environment
+
+
+#+begin_src shell :tangle yes
+zeek -v
+zeek version 3.0.0-rc1
+
+zeekctl status
+Name         Type    Host             Status    Pid    Started
+manager      manager 10.220.170.123   running   9214   12 Aug 02:49:28
+proxy-1      proxy   10.220.170.123   running   9264   12 Aug 02:49:29
+worker-1     worker  10.220.170.121   running   1784   12 Aug 02:49:31
+#+end_src
+
+** VirusTotal-Check
+- [X] [public]  [[file:scripts/files/known_hash.zeek]]
+
+  - [X] [VT_API]  [[file:scripts/files/vt_check.zeek]]
+
+
+
+  - [X] [POSTGRESQL]  [[file:scripts/files/virustotal.zeek]]
+
+
+#+BEGIN_EXAMPLE
+psql -h localhost -p 5432 -U myuser -d testdb  -c 'SELECT * FROM known_hash;' 
+
+ id |        ts        |    host     |                   hash                   |   known_file_types    
+----+------------------+-------------+------------------------------------------+-----------------------
+  1 | 1570941985.53655 | 10.1.10.162 | 2dde1a34ac02478052b691bd18c89c7a13edc5f4 | application/x-dosexec
+  2 | 1570941985.53655 | 10.1.10.162 | 60ff5bfec4df9f809817423b23536601         | application/x-dosexec
+  3 | 1570941988.84281 | 10.1.10.162 | d25af249e01191f08f359b302db42414e0a4587e | application/x-dosexec
+  4 | 1570941988.84281 | 10.1.10.162 | 9cf60bd41e6f235e12e3c761f5d2ef11         | application/x-dosexec
+(4 rows)
+
+ psql -h localhost -p 5432 -U myuser -d testdb  -c 'SELECT permalink FROM virtustotal;' 
+
+                                                       permalink                                                       
+----------------------------------------------------------------------------------------------------------------
+ https://www.virustotal.com/file/fc7eafb97431c3f45a0ced2c38e869f768234897874317ffb0755eb920316294/analysis/1565393170/
+ https://www.virustotal.com/file/8021b619c48d9017a2c3b0beddb1b48d067be75551a44a9d8b79c1daff78ede0/analysis/1560568105/
+(2 rows)
+#+END_EXAMPLE
+
+- [X] [TEST_LOG] [[file:scripts/files/log]]
+
+
+ Please see Install POSTGRESQL-analyzers:
+
+[[https://github.com/hardenedlinux/Debian-GNU-Linux-Profiles/blob/master/NSM/INSTALL/analyzer.sh][Debian-GNU-Linux-Profiles/analyzer.sh at master · hardenedlinux/Debian-GNU-Linux-Profiles]]
+
+** Known/hosts/domains
+- [X] [[file:scripts/protocols/dns/known-domains.zeek]] :Cluster::worker <2019-08-10 Sat 02:36>
+
+  - Test_log: [[file:scripts/protocols/dns/log/known_domain.log]]
+
+
+
+- [X] [[file:scripts/protocols/dns/manager-domains.zeek]]  :Cluster::manager
+
+    - [[file:scripts/protocols/dns/log/manager_known_domain.log]]
+
+
+
+   - add TEST ignore_dns list
+
+
+- [X]  [[file:scripts/protocols/conn/known-hosts-with-dns.zeek]]
+
+  - [[https://github.com/dopheide-esnet/zeek-known-hosts-with-dns/tree/master/scripts][zeek-known-hosts-with-dns/scripts at master · dopheide-esnet/zeek-known-hosts-with-dns]]
+
+
+
+  - ~@unload protocols/conn/known-hosts~
+
+
+  - setting/local_net_field.zeek  [Host_tracking = LOCAL_HOSTS/ALL_HOSTS]
+
+
+** VXLAN
+- [ ] [TODO] [[file:scripts/vlan-info/vlan-data.zeek][VLAN_INFO]] 
+
+  - Add area and adapted to known-hosts[LOCAL_HOSTS]
+
+
+
+** Notice
+*** Setting
+IGNORE - Ignores the notice and won't even log it.
+
+#+begin_src sh :async t
+SSL::Invalid_Server_Cert
+#+end_src
+
+** Count & TOPK
+- [X] [15mins] TOP dns
+
+
+- [ ] [] TOP Unknow HTTP request
+
+
+- [ ] [] TOP metrics
+  :top_size count 20
+  :talker_bin_size = 10000;
+
+  - [ ] [10sec] TOP urls
+
+
+
+  - [ ] [10sec] [] TOP talks

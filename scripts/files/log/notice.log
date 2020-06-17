@@ -1,0 +1,12 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	notice
+#open	2019-09-09-23-30-49
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	fuid	file_mime_type	file_desc	proto	note	msg	sub	src	dst	p	n	peer_descr	actions	suppress_for	remote_location.country_code	remote_location.region	remote_location.city	remote_location.latitude	remote_location.longitude
+#types	time	string	addr	port	addr	port	string	string	string	enum	enum	string	string	addr	addr	port	count	string	set[enum]	interval	string	string	string	double	double
+1568097049.807263	-	-	-	-	-	-	-	-	-	VirusTotal::Match	VirusTotal match on 54 AV engines hit by 10.1.10.162	https://www.virustotal.com/file/fc7eafb97431c3f45a0ced2c38e869f768234897874317ffb0755eb920316294/analysis/1565393170/	10.1.10.162	-	-	54	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1568097124.309593	-	-	-	-	-	-	-	-	-	VirusTotal::Match	VirusTotal match on 48 AV engines hit by 10.1.10.162	https://www.virustotal.com/file/8021b619c48d9017a2c3b0beddb1b48d067be75551a44a9d8b79c1daff78ede0/analysis/1560568105/	10.1.10.162	-	-	48	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1568097214.468354	-	-	-	-	-	-	-	-	-	PacketFilter::Dropped_Packets	125 packets dropped after filtering, 16775 received, 16775 on link	-	-	-	-	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+#close	2019-09-09-23-33-34

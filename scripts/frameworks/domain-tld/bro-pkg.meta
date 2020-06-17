@@ -1,0 +1,5 @@
+[package]
+description = A library for getting the "effective tld" of a domain name.
+tags = library, domain
+version = 1.0.0
+script_dir = scripts

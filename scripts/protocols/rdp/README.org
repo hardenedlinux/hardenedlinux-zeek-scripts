@@ -1,0 +1,44 @@
+#+TITLE: README
+
+* Reference
+
+** [[http://docs.zeek.org/en/latest/script-reference/proto-analyzers.html#bro-rdp][Protocol Analyzers — Zeek User Manual git/master]]
+
+
+
+* Microsft Routing and Remote Access (Osquery & Zeek/RDP)
+
+ - RRAS events
+ - process_open_sockets-osquey where the local port is 3389. Some systems may use VNC on porn 5800/5900, or X11 service on port 600x etc.
+
+   #+begin_src bro :tangle yes
+
+const ports = { 3389/tcp };
+
+
+     #+end_src
+** CVE
+
+# 03 00                - TPKT header: version 3, reserved byte 0
+#                        Must be at the beginning of the packet
+# 02 f0                - X.224 COTP: length 2, PDU type 0x0f (DT_DATA)
+# 00 05 00 14 7c 00 01 - T.124 Connect data, Generic Conference Control (ID 0.0.20.124.0.1)
+#                        PDU size ranges from 230-400 bytes, 256 skipped in the rule
+# 03 c0                - RDP Client Network Data
+#                        Skip the header length and channel count (6 bytes)
+# MS_T120 (C string)   - Name of patched control channel
+#                        Must be within 372 bytes (31 channels * 12 bytes per channel)
+   - RDP::ClientChannelDef
+     - c$rdp$client_channels :: MS_T120
+   - RDP::ClientCoreData
+
+
+# Windows Server 2000 defined 32 Static Virtual Channels (SVCs) with RDP 5.1,
+    - c$rdp$client_build == "RDP 5.1"
+   - GCC
+
+
+* Account Lockout use cases
+** Account Logon Failures Status for event ID 4625
+
+* Monitoring Jump Boxes

@@ -1,0 +1,4 @@
+##[[http://cybercrime-tracker.net/][CyberCrime]]#
+#fields indicator       indicator_type  meta.source     meta.desc       meta.url
+link.kunstsignal.com Intel::DOMAIN   source2 Name used for data exfiltration -
+other.domain.com	Intel::DOMAIN domain	DOMAIN

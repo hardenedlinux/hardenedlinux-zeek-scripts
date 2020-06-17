@@ -1,0 +1,11 @@
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	intel
+#open	2018-01-22-17-59-04
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	seen.indicator	seen.indicator_type	seen.where	seen.node	matched	sources	fuid	file_mime_type	file_desc
+#types	time	string	addr	port	addr	port	string	enum	enum	string	set[enum]	set[string]	string	string	string
+1300475171.677081	CAnFrb2Cvxr5T7quOc	141.142.220.226	55131	224.0.0.252	5355	224.0.0.252	Intel::ADDR	Conn::IN_RESP	bro	Intel::ADDR	source1	-	-	-
+1300475173.117362	CzrZOtXqhwwndQva3	141.142.220.226	55671	224.0.0.252	5355	224.0.0.252	Intel::ADDR	Conn::IN_RESP	bro	Intel::ADDR	source1	-	-	-
+#close	2018-01-22-17-59-04
