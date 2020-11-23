@@ -173,12 +173,14 @@ event DNS::log_dns(rec: DNS::Info)
    + [[https://www.sans.org/reading-room/whitepapers/dns/detecting-dns-tunneling-34152][Detecting DNS Tunneling]]
    + [[https://www.researchgate.net/publication/297704337_Detection_of_Tunnels_in_PCAP_Data_by_Random_Forests][(PDF) Detection of Tunnels in PCAP Data by Random Forests]]
    + [[https://www.usenix.org/system/files/conference/usenixsecurity12/sec12-final116.pdf][sec12-final116.pdf]]
-     a. DNS responses may contain several A records, but only the first one will be likely to receive a connection. It is thus better to use the whole-message DNS schema rather the individual resource record schema.
-     b. We only want to count responses that do not have matching packets, so we need to use an EXCLUSIVE LEFT SINGLE JOIN.
-     c. Because individual false positives may occur, we should apply a per-client threshold to unmatched responses, which will
+
+     1. DNS responses may contain several A records, but only the first one will be likely to receive a connection. It is thus better to use the whole-message DNS schema rather the individual resource record schema.
+     2. We only want to count responses that do not have matching packets, so we need to use an EXCLUSIVE LEFT SINGLE JOIN.
+     3. Because individual false positives may occur, we should apply a per-client threshold to unmatched responses, which will
 
  - redef request_count_threshold = 100 &redef;
    * TODO check timestramp
+
       The timestamps of the first and last responses can then be checked in the HAVING clause to make sure they occurred within some reasonable amount of time (one hour in this case).
 #+begin_src zeek :exports both :tangle "~/project/hardenedlinux-zeek-script/scripts/protocols/dns/dns-tunnels.zeek"
 #source from https://github.com/hhzzk/dns-tunnels/blob/master/scripts/main.bro

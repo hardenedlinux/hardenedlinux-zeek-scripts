@@ -23,21 +23,17 @@ nix build
 sh pre-run-zeekctl.sh
 nix run -c deploy
 #+end_src
-
-
 ** Using Zeek's binary  via hardenedlinux binary cache machines(Speed up)
 #+begin_src sh :async t :exports both :results output
-git clone https://github.com/hardenedlinux/nixpkgs-hardenedlinux
-nix-build nixpkgs-hardenedlinux/test/zeek.nix --option substituters "https://cache.nixos.org http://221.4.35.244:8301" --option trusted-public-keys "221.4.35.2
-44:3ehdeUIC5gWzY+I7iF3lrpmxOMyEZQbZlcjOmlOVpeo="                                                                                         
-these derivations will be built:                                                                                                 /nix/store/z0wbd0vgrv5dddxswrw1v3qdx7g1yrbi-nsm-zeek.drv                                                                               
-these paths will be fetched (0.00 MiB download, 37.78 MiB unpacked):                                                                     
-  /nix/store/3i9f2f5rklrw4x0rafs8l440h7qs8r8i-zeek-3.0.6                                                                                 
-copying path '/nix/store/3i9f2f5rklrw4x0rafs8l440h7qs8r8i-zeek-3.0.6' from 'http://221.4.35.244:8301'...                                 
-building '/nix/store/z0wbd0vgrv5dddxswrw1v3qdx7g1yrbi-nsm-zeek.drv'...                                                                   
-created 7 symlinks in user environment                                                                                                   
-/nix/store/pr41149ralbb71abdny78dnlzaaj789n-nsm-zeek 
+nix build  --option sandbox false --option substituters "https://cache.nixos.org http://221.4.35.244:8301" --option trusted-public-keys "221.4.35.244:3ehdeUIC5gWzY+I7iF3lrpmxOMyEZQbZlcjOmlOVpeo= cache.nixos.org-1:${yourtrustkey check nix.conf }"
 #+end_src
+** Using Nix zeek Script manager
+#+begin_src sh :async t :exports both :results output
+git clone https://github.com/hardenedlinux/zeek-nix
+cd zeek-scripts
+nix-build
+#+end_src
+- ./reuslt/bin/<zeek-scirpts>
 
 * Deploy Zeek kafka topics with Nix home-manager on Debian(OS)
 - get more information: https://github.com/hardenedlinux/debian-nix-manager
