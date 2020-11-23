@@ -15,9 +15,15 @@
 * Buding Zeek with Nix package manager
 ** Building Zeek's binary by nix package manager
 #+begin_src sh :async t :exports both :results output
-git clone https://github.com/hardenedlinux/nixpkgs-hardenedlinux
-nix-build nixpkgs-hardenedlinux/test/zeek.nix
+git clone https://github.com/hardenedlinux/zeek-nix
+nix build
 #+end_src
+- deploy zeek with zeekctl
+#+begin_src sh :async t :exports both :results output
+sh pre-run-zeekctl.sh
+nix run -c deploy
+#+end_src
+
 
 ** Using Zeek's binary  via hardenedlinux binary cache machines(Speed up)
 #+begin_src sh :async t :exports both :results output

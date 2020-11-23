@@ -1,69 +1,57 @@
-+++
-title = "README hardenedlinux-zeek-script"
-lastmod = 2020-11-22T23:47:38-08:00
-draft = false
-creator = "Emacs 28.0.50 (Org mode 9.4 + ox-hugo)"
-author = "GTrunSec"
-+++
+#+TITLE: README hardenedlinux-zeek-script
+#+AUTHOR: GTrunSec
+#+EMAIL: gtrunsec@hardenedlinux.org
+#+DATE: 20 September 2020
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en cn
+#+SETUPFILE: ./hugo.setup
+#+SETUPFILE: ~/Documents/my-blog/public/theme/org-html-themes/setup/theme-readtheorg.setup
+#+hugo_publishdate: (0 5)
+#+hugo_auto_set_lastmod: t
+#+HUGO_categories:
+#+HUGO_tags:
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+PROPERTY: header-args:sh :prologue "exec 2>&1" :epilogue ":"
+* Clone Repo
+:PROPERTIES:
+:header-args:sh: :dir ~/project
+:END:
 
-<style>
-  .ox-hugo-toc ul {
-    list-style: none;
-  }
-</style>
-<div class="ox-hugo-toc toc">
-<div></div>
-
-<div class="heading">Table of Contents</div>
-
-- <span class="section-num">1</span> [Clone Repo](#clone-repo)
-- <span class="section-num">2</span> [Protols](#protols)
-    - <span class="section-num">2.1</span> [DNS](#dns)
-    - <span class="section-num">2.2</span> [TOP DNS](#top-dns)
-        - <span class="section-num">2.2.1</span> [Log output](#log-output)
-    - <span class="section-num">2.3</span> [DNS Tunneling](#dns-tunneling)
-    - <span class="section-num">2.4</span> [DynamicDNS](#dynamicdns)
-    - <span class="section-num">2.5</span> [TOP Sites -> Notice Unkown sites or SumStats](#top-sites-notice-unkown-sites-or-sumstats)
-        - <span class="section-num">2.5.1</span> [Log output](#log-output)
-- <span class="section-num">3</span> [attachment analysis zip](#attachment-analysis-zip)
-    - <span class="section-num">3.1</span> [Log Ouput](#log-ouput)
-
-</div>
-<!--endtoc-->
-
-
-
-## <span class="section-num">1</span> Clone Repo {#clone-repo}
-
-```sh
+#+begin_src sh :async t :exports both :results output
 git clone https://github.com/hardenedlinux/hardenedlinux-zeek-script.git
-```
+#+end_src
 
+#+RESULTS:
 
-## <span class="section-num">2</span> Protols {#protols}
+* Protols
+:PROPERTIES:
+:header-args:sh: :dir ~/project/hardenedlinux-zeek-script/scripts/protocols
+:END:
+** DNS
+:PROPERTIES:
+:header-args:sh: :dir ~/project/hardenedlinux-zeek-script/scripts/protocols/dns
+:END:
+** TOP DNS
 
+- redef TopDNS::logging_interval = 15mins;
+- redef TopDNS::top_k = 10;
+- redef TopDNS::records += {"MX"};
+- redef TopDNS::use_trimmed_domain = T;
+  www.google.co.uk would be trimmed to google.co.uk
 
-### <span class="section-num">2.1</span> DNS {#dns}
-
-
-### <span class="section-num">2.2</span> TOP DNS {#top-dns}
-
--   redef TopDNS::logging\_interval = 15mins;
--   redef TopDNS::top\_k = 10;
--   redef TopDNS::records += {"MX"};
--   redef TopDNS::use\_trimmed\_domain = T;
-    www.google.co.uk would be trimmed to google.co.uk
-
-<!--listend-->
-
-```zeek
+#+begin_src zeek :exports both :tangle "~/project/hardenedlinux-zeek-script/setting/dns-setting.zeek"
 @load ../scripts/protocols/dns/top_dns.zeek
 
 redef TopDNS::records += {"MX"};
 redef TopDNS::logging_interval = 1hr;
-```
+#+end_src
 
-```zeek
+
+
+#+begin_src zeek :exports both :tangle "~/project/hardenedlinux-zeek-script/scripts/protocols/dns/top_dns.zeek"
 #source frome https://github.com/corelight/top-dns/blob/master/scripts/main.bro
 @load base/utils/site
 @load base/frameworks/sumstats
@@ -161,12 +149,9 @@ event DNS::log_dns(rec: DNS::Info)
         SumStats::observe("top-dns-name", [$str=rec$qtype_name], [$str=q]);
         }
     }
-```
-
-
-#### <span class="section-num">2.2.1</span> Log output {#log-output}
-
-```conf
+#+end_src
+***  Log output
+#+begin_src conf :exports both :tangle "~/project/zeek-logs-pcap-dataset/dns/top_dns.log"
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
@@ -178,26 +163,24 @@ event DNS::log_dns(rec: DNS::Info)
 1478326612.329093	3600.000000	AAAA	com.(),com.{,com.:;,com.};,com.path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi,irongeek.com,debian.(),debian,debian.{,debian.:;	968,968,968,968,968,956,38,38,24,24	0,0,0,0,0,0,0,0,0,0
 1478326612.329093	3600.000000	A	com.(),com.{,com.:;,com.};,com.path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi,irongeek.com,google.com,mozilla.com	968,968,968,968,968,956,6,6	0,0,0,0,0,0,0,0
 #close	2020-11-22-22-34-37
-```
+#+end_src
 
+** DNS Tunneling
+:PROPERTIES:
+:ID:       16aee1fa-fac2-4d96-84df-547a3516acbf
+:END:
+ - [2020-11-22 Sun 21:19] -> [[id:d233abe0-22a6-4ab4-9bac-8abddfd725ee][hhzzk/dns-tunnels]]
+   + [[https://www.sans.org/reading-room/whitepapers/dns/detecting-dns-tunneling-34152][Detecting DNS Tunneling]]
+   + [[https://www.researchgate.net/publication/297704337_Detection_of_Tunnels_in_PCAP_Data_by_Random_Forests][(PDF) Detection of Tunnels in PCAP Data by Random Forests]]
+   + [[https://www.usenix.org/system/files/conference/usenixsecurity12/sec12-final116.pdf][sec12-final116.pdf]]
+     a. DNS responses may contain several A records, but only the first one will be likely to receive a connection. It is thus better to use the whole-message DNS schema rather the individual resource record schema.
+     b. We only want to count responses that do not have matching packets, so we need to use an EXCLUSIVE LEFT SINGLE JOIN.
+     c. Because individual false positives may occur, we should apply a per-client threshold to unmatched responses, which will
 
-### <span class="section-num">2.3</span> DNS Tunneling {#dns-tunneling}
-
--   <span class="timestamp-wrapper"><span class="timestamp">[2020-11-22 Sun 21:19] </span></span> -> [hhzzk/dns-tunnels](awesome-zeek.md)
-    -   [Detecting DNS Tunneling](https://www.sans.org/reading-room/whitepapers/dns/detecting-dns-tunneling-34152)
-    -   [(PDF) Detection of Tunnels in PCAP Data by Random Forests](https://www.researchgate.net/publication/297704337%5FDetection%5Fof%5FTunnels%5Fin%5FPCAP%5FData%5Fby%5FRandom%5FForests)
-    -   [sec12-final116.pdf](https://www.usenix.org/system/files/conference/usenixsecurity12/sec12-final116.pdf)
-        1.  DNS responses may contain several A records, but only the first one will be likely to receive a connection. It is thus better to use the whole-message DNS schema rather the individual resource record schema.
-        2.  We only want to count responses that do not have matching packets, so we need to use an EXCLUSIVE LEFT SINGLE JOIN.
-        3.  Because individual false positives may occur, we should apply a per-client threshold to unmatched responses, which will
-
--   redef request\_count\_threshold = 100 &redef;
-    -   TODO check timestramp
-        The timestamps of the first and last responses can then be checked in the HAVING clause to make sure they occurred within some reasonable amount of time (one hour in this case).
-
-<!--listend-->
-
-```zeek
+ - redef request_count_threshold = 100 &redef;
+   * TODO check timestramp
+      The timestamps of the first and last responses can then be checked in the HAVING clause to make sure they occurred within some reasonable amount of time (one hour in this case).
+#+begin_src zeek :exports both :tangle "~/project/hardenedlinux-zeek-script/scripts/protocols/dns/dns-tunnels.zeek"
 #source from https://github.com/hhzzk/dns-tunnels/blob/master/scripts/main.bro
 # Script for detecting DNS Tunnels attack
 
@@ -292,18 +275,14 @@ event DNS_TUNNELS::dns_request(c:connection, msg: dns_msg, query: string, qtype:
         cq_table[src_ip] = 0;
         }
     }
-```
+ #+end_src
+
+** DynamicDNS
+get feed http://www.malware-domains.com/files/dynamic_dns.zip
 
 
-### <span class="section-num">2.4</span> DynamicDNS {#dynamicdns}
-
-get feed <http://www.malware-domains.com/files/dynamic%5Fdns.zip>
-
--   redef DynamicDNS::ignore\_dyndns\_fqdns {};
-
-<!--listend-->
-
-```zeek
+- redef DynamicDNS::ignore_dyndns_fqdns {};
+#+begin_src zeek :exports both :tangle "~/project/hardenedlinux-zeek-script/scripts/protocols/dns/dyndns.zeek"
 
 @load base/frameworks/input/
 @load ../../frameworks/domain-tld/scripts
@@ -470,18 +449,13 @@ event Conn::log_conn(rec: Conn::Info)
                 $sub=dyndns_resolved_ips[ip], $conn=c, $suppress_for=30mins,
                 $identifier=cat(c$id$orig_h,c$id$resp_h,c$id$resp_p)]);
     }
-```
+#+end_src
 
-
-### <span class="section-num">2.5</span> TOP Sites -> Notice Unkown sites or SumStats {#top-sites-notice-unkown-sites-or-sumstats}
-
--   [Alexa - Top sites](https://www.alexa.com/topsites)
--   Alexa Top Sites
-    -   redef Alexa::ignore\_dns { "WORKGROUP", "DOMEX"};
-
-<!--listend-->
-
-```zeek
+** TOP Sites -> Notice Unkown sites or SumStats
+- [[https://www.alexa.com/topsites][Alexa - Top sites]]
+- Alexa Top Sites
+  + redef Alexa::ignore_dns { "WORKGROUP", "DOMEX"};
+#+begin_src zeek :exports both :tangle "~/project/hardenedlinux-zeek-script/scripts/protocols/dns/alexa/alexa_validation.zeek"
 @load base/protocols/dns
 @load base/frameworks/notice
 @load base/frameworks/input
@@ -575,12 +549,10 @@ event DNS::log_dns(rec: DNS::Info)
                 $identifier=cat(rec$id$orig_h,rec$query)]);
             }
         }
-```
+#+end_src
 
-
-#### <span class="section-num">2.5.1</span> Log output {#log-output}
-
-```conf
+*** Log output
+  #+begin_src conf :exports both :tangle "~/project/zeek-logs-pcap-dataset/dns/notice.log"
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
@@ -610,15 +582,11 @@ event DNS::log_dns(rec: DNS::Info)
 1416104396.192075	CjVmyi4hUCHlIMYNW2	172.16.165.165	58144	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	k34en6w3n-pc	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
 1416104396.192075	CjVmyi4hUCHlIMYNW2	172.16.165.165	58144	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	k34en6w3n-pc	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
 #close	2020-11-22-23-33-01
-```
+  #+end_src
 
-
-## <span class="section-num">3</span> attachment analysis zip {#attachment-analysis-zip}
-
-
-### <span class="section-num">3.1</span> Log Ouput {#log-ouput}
-
-```conf
+* attachment analysis zip
+** Log Ouput
+  #+begin_src conf :exports both :tangle "~/project/zeek-logs-pcap-dataset/zip/zip.log"
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
@@ -630,4 +598,4 @@ event DNS::log_dns(rec: DNS::Info)
 1478375945.091326	F1VklK3evXm01AvZd	,Fl5Hxx.war,META-INF/application.xml	220	6519	6519	1606112243	0	0	0	102447920
 1478375945.091326	F1VklK3evXm01AvZd	,WEB-INF/,WEB-INF/web.xml,WEB-INF/classes/,WEB-INF/classes/metasploit/,WEB-INF/classes/metasploit/Payload.class,WEB-INF/classes/metasploit/PayloadServlet.class,WEB-INF/classes/metasploit.dat	220	6054	6054	1606112243	0	0	0	262380576
 #close	2020-11-22-22-17-23
-```
+  #+end_src
