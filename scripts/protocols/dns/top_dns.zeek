@@ -6,18 +6,18 @@ module TopDNS;
 
 export {
 	## How many of the top missing names should be logged.
-	const top_k = 10 &redef;
+	option top_k = 10 &redef;
 
 	## How often the log should be written.
-	const logging_interval = 15mins &redef;
+	option logging_interval = 15mins &redef;
 
 	## If you would like to measure trimmed "effective domains".
 	## This will take something like "www.google.co.uk" and only 
 	## use "google.co.uk" as the measured value.
-	const use_trimmed_domain = F &redef;
+	option use_trimmed_domain = F &redef;
 
 	## The records that should be tracked and logged.
-	const records: set[string] = { "A",
+	option records: set[string] = { "A",
 	    "AAAA",
 	    "CNAME",
 	    } &redef;
