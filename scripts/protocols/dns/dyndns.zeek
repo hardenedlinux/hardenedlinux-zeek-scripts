@@ -34,8 +34,8 @@ module DynamicDNS;
 # Set the name/location of the txt file that contains the domains via redef of dyndns_filename
 export {
     redef enum Notice::Type += { DynDNS::HTTP, DynDNS::DNS, DynDNS::Traffic, DynDNS::SSL };
-    const ignore_dyndns_fqdns: set[string] = { } &redef;
-    const dyndns_filename = "dynamic_dns.txt" &redef;
+    option ignore_dyndns_fqdns: set[string] = { } &redef;
+    const dyndns_filename = "/home/gtrun/project/hardenedlinux-zeek-script/scripts/protocols/dns/dynamic_dns.txt" &redef;
     #const dyndns_filename = "/Users/gtrun/project/SA-tools/sensor/zeek/script/hardenedlinux-zeek-script/scripts/protocols/dns/dynamic_dns.txt" &redef;
 
     global dyndns_domains: set[string] = set();
@@ -104,7 +104,7 @@ hook DNS::do_reply(c: connection, msg: dns_msg, ans: dns_answer, reply: string)
         if ( domain in dyndns_domains )
             {
             NOTICE([$note=DynDNS::DNS, $msg="Found Dynamic DNS Hostname", 
-                    $sub=value, $conn=c, $suppress_for=30mins, 
+                    $sub=value, $conn=c, $suppress_for=30mins,
                     $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
             dyn = T;
             }

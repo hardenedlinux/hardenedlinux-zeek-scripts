@@ -1,0 +1,633 @@
++++
+title = "README hardenedlinux-zeek-script"
+lastmod = 2020-11-22T23:47:38-08:00
+draft = false
+creator = "Emacs 28.0.50 (Org mode 9.4 + ox-hugo)"
+author = "GTrunSec"
++++
+
+<style>
+  .ox-hugo-toc ul {
+    list-style: none;
+  }
+</style>
+<div class="ox-hugo-toc toc">
+<div></div>
+
+<div class="heading">Table of Contents</div>
+
+- <span class="section-num">1</span> [Clone Repo](#clone-repo)
+- <span class="section-num">2</span> [Protols](#protols)
+    - <span class="section-num">2.1</span> [DNS](#dns)
+    - <span class="section-num">2.2</span> [TOP DNS](#top-dns)
+        - <span class="section-num">2.2.1</span> [Log output](#log-output)
+    - <span class="section-num">2.3</span> [DNS Tunneling](#dns-tunneling)
+    - <span class="section-num">2.4</span> [DynamicDNS](#dynamicdns)
+    - <span class="section-num">2.5</span> [TOP Sites -> Notice Unkown sites or SumStats](#top-sites-notice-unkown-sites-or-sumstats)
+        - <span class="section-num">2.5.1</span> [Log output](#log-output)
+- <span class="section-num">3</span> [attachment analysis zip](#attachment-analysis-zip)
+    - <span class="section-num">3.1</span> [Log Ouput](#log-ouput)
+
+</div>
+<!--endtoc-->
+
+
+
+## <span class="section-num">1</span> Clone Repo {#clone-repo}
+
+```sh
+git clone https://github.com/hardenedlinux/hardenedlinux-zeek-script.git
+```
+
+
+## <span class="section-num">2</span> Protols {#protols}
+
+
+### <span class="section-num">2.1</span> DNS {#dns}
+
+
+### <span class="section-num">2.2</span> TOP DNS {#top-dns}
+
+-   redef TopDNS::logging\_interval = 15mins;
+-   redef TopDNS::top\_k = 10;
+-   redef TopDNS::records += {"MX"};
+-   redef TopDNS::use\_trimmed\_domain = T;
+    www.google.co.uk would be trimmed to google.co.uk
+
+<!--listend-->
+
+```zeek
+@load ../scripts/protocols/dns/top_dns.zeek
+
+redef TopDNS::records += {"MX"};
+redef TopDNS::logging_interval = 1hr;
+```
+
+```zeek
+#source frome https://github.com/corelight/top-dns/blob/master/scripts/main.bro
+@load base/utils/site
+@load base/frameworks/sumstats
+@load ../../frameworks/domain-tld/scripts
+module TopDNS;
+
+export {
+	## How many of the top missing names should be logged.
+	const top_k = 10 &redef;
+
+	## How often the log should be written.
+	const logging_interval = 15mins &redef;
+
+	## If you would like to measure trimmed "effective domains".
+	## This will take something like "www.google.co.uk" and only
+	## use "google.co.uk" as the measured value.
+	const use_trimmed_domain = F &redef;
+
+	## The records that should be tracked and logged.
+	const records: set[string] = { "A",
+	    "AAAA",
+	    "CNAME",
+	    } &redef;
+
+    ## The log ID.
+    redef enum Log::ID += { LOG };
+
+    type Info: record {
+	    ## Timestamp of when the data was finalized.
+	    ts:           time             &log;
+
+	    ## Length of time that this Top measurement represents.
+	    ts_delta:     interval         &log;
+
+	    ## The query type that this log line refers to.
+	    record_type:  string           &log;
+
+	    ## The top queries being performed.
+	    top_queries:  vector of string &log;
+
+	    ## The estimated counts of each of the top queries.
+	    top_counts:   vector of count  &log;
+
+	    ## The estimated distance from the true value for each reported value.
+	    top_epsilons: vector of count  &log;
+	    };
+    }
+
+event zeek_init() &priority=5
+	{
+	Log::create_stream(TopDNS::LOG, [$columns=Info, $path="top_dns"]);
+
+	local r1 = SumStats::Reducer($stream="top-dns-name",
+        $apply=set(SumStats::TOPK),
+        $topk_size=top_k*10);
+    SumStats::create([$name="find-top-queries",
+        $epoch=logging_interval,
+        $reducers=set(r1),
+        $epoch_result(ts: time, key: SumStats::Key, result: SumStats::Result) =
+    {
+    local r = result["top-dns-name"];
+    local s: vector of SumStats::Observation;
+    s = topk_get_top(r$topk, top_k);
+
+    local top_queries = string_vec();
+    local top_counts = index_vec();
+    local top_epsilons = index_vec();
+    local i = 0;
+    for ( element in s )
+	    {
+	    top_queries[|top_queries|] = s[element]$str;
+	    top_counts[|top_counts|] = topk_count(r$topk, s[element]);
+	    top_epsilons[|top_epsilons|] = topk_epsilon(r$topk, s[element]);
+
+	    if ( ++i == top_k )
+	        break;
+	        }
+
+	    Log::write(TopDNS::LOG, [ $ts=ts,
+            $ts_delta=logging_interval,
+            $record_type=key$str,
+            $top_queries=top_queries,
+            $top_counts=top_counts,
+            $top_epsilons=top_epsilons
+        ]);
+        }
+    ]);
+    }
+
+event DNS::log_dns(rec: DNS::Info)
+	{
+	if ( rec?$query && rec?$qtype && rec$qtype_name in records &&! Site::is_local_name(rec$query) )
+        {
+        local q = use_trimmed_domain ? DomainTLD::effective_domain(rec$query) : rec$query;
+        SumStats::observe("top-dns-name", [$str=rec$qtype_name], [$str=q]);
+        }
+    }
+```
+
+
+#### <span class="section-num">2.2.1</span> Log output {#log-output}
+
+```conf
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	top_dns
+#open	2020-11-22-22-34-37
+#fields	ts	ts_delta	record_type	top_queries	top_counts	top_epsilons
+#types	time	interval	string	vector[string]	vector[count]	vector[count]
+1478326612.329093	3600.000000	AAAA	com.(),com.{,com.:;,com.};,com.path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi,irongeek.com,debian.(),debian,debian.{,debian.:;	968,968,968,968,968,956,38,38,24,24	0,0,0,0,0,0,0,0,0,0
+1478326612.329093	3600.000000	A	com.(),com.{,com.:;,com.};,com.path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi,irongeek.com,google.com,mozilla.com	968,968,968,968,968,956,6,6	0,0,0,0,0,0,0,0
+#close	2020-11-22-22-34-37
+```
+
+
+### <span class="section-num">2.3</span> DNS Tunneling {#dns-tunneling}
+
+-   <span class="timestamp-wrapper"><span class="timestamp">[2020-11-22 Sun 21:19] </span></span> -> [hhzzk/dns-tunnels](awesome-zeek.md)
+    -   [Detecting DNS Tunneling](https://www.sans.org/reading-room/whitepapers/dns/detecting-dns-tunneling-34152)
+    -   [(PDF) Detection of Tunnels in PCAP Data by Random Forests](https://www.researchgate.net/publication/297704337%5FDetection%5Fof%5FTunnels%5Fin%5FPCAP%5FData%5Fby%5FRandom%5FForests)
+    -   [sec12-final116.pdf](https://www.usenix.org/system/files/conference/usenixsecurity12/sec12-final116.pdf)
+        1.  DNS responses may contain several A records, but only the first one will be likely to receive a connection. It is thus better to use the whole-message DNS schema rather the individual resource record schema.
+        2.  We only want to count responses that do not have matching packets, so we need to use an EXCLUSIVE LEFT SINGLE JOIN.
+        3.  Because individual false positives may occur, we should apply a per-client threshold to unmatched responses, which will
+
+-   redef request\_count\_threshold = 100 &redef;
+    -   TODO check timestramp
+        The timestamps of the first and last responses can then be checked in the HAVING clause to make sure they occurred within some reasonable amount of time (one hour in this case).
+
+<!--listend-->
+
+```zeek
+#source from https://github.com/hhzzk/dns-tunnels/blob/master/scripts/main.bro
+# Script for detecting DNS Tunnels attack
+
+@load base/frameworks/notice
+
+module DNS_TUNNELS;
+
+export {
+
+    redef enum Notice::Type += {
+
+        ## The volume of the requests is bigger than the threshold.
+        RequestCountOverload,
+
+        ## The count of numeral of the request is overmuch.
+        OvermuchNumber,
+
+        ## DNS tunnels attack
+        DnsTunnelsAttack
+
+    };
+
+    ## The threshold of the request count in a certain period.
+    ## When the volume of the requests of a specific host is
+    ## bigger than this threshold, we consider the host is attacked.
+    option request_count_threshold = 100 &redef;
+
+    ## The legal threshold of the query length
+    option query_len_threshold = 27 &redef;
+
+    ## The legal percentage of numeral in the query
+    option percentage_of_num_count = 0.2 &redef;
+
+    ## The expired time of the record
+    option record_expiration = 5min &redef;
+
+}
+
+# Map client ip to query count
+global cq_table: table[addr] of count &read_expire = record_expiration;
+
+event DNS_TUNNELS::dns_request(c:connection, msg: dns_msg, query: string, qtype: count, qclass: count)
+{
+    if(query == "")
+        return;
+
+    local query_len = |query|;
+    local count_of_num = 0;
+
+    local src_ip = c$id$orig_h;
+    if(src_ip in cq_table)
+    {
+        if(cq_table[src_ip]+1 > request_count_threshold)
+        {
+            NOTICE([$note = RequestCountOverload,
+                    $conn = c,
+                    $msg = fmt("The host %s is overloaded", src_ip)
+            ]);
+            delete cq_table[src_ip];
+            return;
+        }
+        else
+        {
+            cq_table[src_ip] += 1;
+
+            # If the length of the query is bgiger than the threshold,
+            # we consider this is a suspicious packet and do the DPI.
+            local num_string = "0123456789";
+            local num_count = 0;
+            if(query_len > query_len_threshold)
+            {
+                for (i in query)
+                {
+                    # Calculate numeral count
+                    if (i in num_string)
+                        num_count += 1;
+                }
+                # The operator "/" will drop the fractional part, so we time 10
+                if(num_count*10 / query_len > percentage_of_num_count)
+                {
+                    NOTICE([$note = OvermuchNumber,
+                            $conn = c,
+                            $msg = fmt("The numeral in reques is overmuch")
+                    ]);
+                    return;
+                }
+            }
+        }
+    }
+    else
+        {
+        cq_table[src_ip] = 0;
+        }
+    }
+```
+
+
+### <span class="section-num">2.4</span> DynamicDNS {#dynamicdns}
+
+get feed <http://www.malware-domains.com/files/dynamic%5Fdns.zip>
+
+-   redef DynamicDNS::ignore\_dyndns\_fqdns {};
+
+<!--listend-->
+
+```zeek
+
+@load base/frameworks/input/
+@load ../../frameworks/domain-tld/scripts
+module DynamicDNS;
+
+# This module is used to look for dynamic dns domains that are present in various kinds of
+# network traffic. For HTTP, the HOST header value is checked, for DNS the query request value
+# is checked, and for SSL the server value is checked. Since dynamic DNS domains often take
+# the format of <user defined>.domain.tld the value in the host header is stripped of everything
+# to the left of domain.tld, in the event that doesn't match the check is expanded to
+# something.domain.tld.
+#
+# A good place to get started is malware-domains dyndns list, the following will put it in the
+# right format for this script:
+# wget "http://www.malware-domains.com/files/dynamic_dns.zip" && unzip -c dynamic_dns.zip | tail -n +4 | grep -v ^# | grep -v ^$ | cut -f 1 > tmp.txt && echo -e "#fields\tdomain" > dynamic_dns.txt && cat tmp.txt | cut -d '#' -f 1 >> dynamic_dns.txt && rm tmp.txt dynamic_dns.zip
+#
+# In additon to looking for the presence of dynamic DNS domains it will keep track (for 1 day)
+# all IPs that resolve to a dynamic DNS domain, and flag any traffic destined to those IP addresses
+#
+# Requires Bro 2.1
+# Mike (sooshie@gmail.com)
+
+##JP Bourget 10/29/13
+##Updated for Bro 2.2 - byte_len is depricated and replaced with | | (2 pipes)
+
+## Brian Kellogg 12/2/2014
+## Updated for Bro 2.3 - DNS::do_reply is now a hook not an event,
+## Added logic to check for conn$dns field before looking for conn$dns$query field - if ((c?$dns) && (c$dns?$query))
+
+## Mike 8/17/2015
+## It apparently doesn't crash in Bro 2.4, and it still works
+
+# To ignore specific hostnames just add them to ignore_dyndns_fqdns
+# Set the name/location of the txt file that contains the domains via redef of dyndns_filename
+export {
+    redef enum Notice::Type += { DynDNS::HTTP, DynDNS::DNS, DynDNS::Traffic, DynDNS::SSL };
+    option ignore_dyndns_fqdns: set[string] = { } &redef;
+    const dyndns_filename = "/home/gtrun/project/hardenedlinux-zeek-script/scripts/protocols/dns/dynamic_dns.txt" &redef;
+    #const dyndns_filename = "/Users/gtrun/project/SA-tools/sensor/zeek/script/hardenedlinux-zeek-script/scripts/protocols/dns/dynamic_dns.txt" &redef;
+
+    global dyndns_domains: set[string] = set();
+
+    }
+
+type Idx: record {
+    domain: string;
+
+};
+
+#global dyndns_domains: set[string] = set();
+global dyndns_resolved_ips: table[addr] of string = table() &create_expire=1days;
+global dyndnslist_ready: bool = F;
+
+
+event zeek_init()
+    {
+    Input::add_table([$source=dyndns_filename, $mode=Input::REREAD,
+        $name="dynlist", $idx=Idx, $destination=dyndns_domains]);
+    Input::remove("dynlist");
+
+    }
+
+# fwd compat to 2.2
+event Input::end_of_data(name: string, source: string)
+    {
+    if ( name == "dynlist" )
+        dyndnslist_ready = T;
+    }
+
+event http_header(c: connection, is_orig: bool, name: string, value: string)
+    {
+    if ( ! is_orig )
+        return;
+    if ( ! dyndnslist_ready)
+        return;
+    if ( name == "HOST" )
+        {
+        if ( value in ignore_dyndns_fqdns )
+            return;
+        local domain = DomainTLD::effective_domain(value);
+        if ( domain in dyndns_domains )
+            {
+            NOTICE([$note=DynDNS::HTTP, $msg="Found Dynamic DNS Hostname",
+                    $sub=value, $conn=c, $suppress_for=30mins,
+                    $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
+            return;
+            }
+        }
+    }
+
+hook DNS::do_reply(c: connection, msg: dns_msg, ans: dns_answer, reply: string)
+    {
+    if ( ! dyndnslist_ready)
+        return;
+
+    local dyn = F;
+    local value: string;
+    if ((c?$dns) && (c$dns?$query))
+        {
+        value = c$dns$query;
+        if ( value in ignore_dyndns_fqdns )
+            return;
+        local domain = DomainTLD::effective_domain(value);
+        if ( domain in dyndns_domains )
+            {
+            NOTICE([$note=DynDNS::DNS, $msg="Found Dynamic DNS Hostname",
+                    $sub=value, $conn=c, $suppress_for=30mins,
+                    $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
+            dyn = T;
+            }
+
+        }
+    if ( dyn )
+        {
+        if ( c$dns?$answers )
+            {
+            for ( a in c$dns$answers )
+                {
+                if ( /[a-zA-z]/ in c$dns$answers[a] )
+                    return;
+                local ip = to_addr(c$dns$answers[a]);
+                if ( ip in 0.0.0.0/0 )
+                    dyndns_resolved_ips[ip] = value;
+                }
+            }
+        }
+    }
+
+event ssl_established(c: connection)
+{
+    if ( ! dyndnslist_ready)
+        return;
+
+    if(c$ssl?$server_name)
+        {
+        local value = c$ssl$server_name;
+        if ( value in ignore_dyndns_fqdns )
+            return;
+        local domain = DomainTLD::effective_domain(value);
+
+        if ( domain in dyndns_domains )
+            NOTICE([$note=DynDNS::SSL, $msg="Found Dynamic DNS Hostname",
+                    $sub=value, $conn=c, $suppress_for=30mins,
+                    $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
+        }
+}
+
+event Conn::log_conn(rec: Conn::Info)
+    {
+    if ( ! dyndnslist_ready)
+        return;
+
+    local ip = rec$id$resp_h;
+    local c: connection;
+    local cid: conn_id;
+    c$id = cid;
+    c$uid = rec$uid;
+    c$id$orig_h = rec$id$orig_h;
+    c$id$resp_h = rec$id$resp_h;
+    c$id$resp_p = rec$id$resp_p;
+    c$id$orig_p = rec$id$orig_p;
+    if ( ip in dyndns_resolved_ips )
+        NOTICE([$note=DynDNS::Traffic, $msg="Traffic to a DynDNS resolved IP",
+                $sub=dyndns_resolved_ips[ip], $conn=c, $suppress_for=30mins,
+                $identifier=cat(c$id$orig_h,c$id$resp_h,c$id$resp_p)]);
+    }
+```
+
+
+### <span class="section-num">2.5</span> TOP Sites -> Notice Unkown sites or SumStats {#top-sites-notice-unkown-sites-or-sumstats}
+
+-   [Alexa - Top sites](https://www.alexa.com/topsites)
+-   Alexa Top Sites
+    -   redef Alexa::ignore\_dns { "WORKGROUP", "DOMEX"};
+
+<!--listend-->
+
+```zeek
+@load base/protocols/dns
+@load base/frameworks/notice
+@load base/frameworks/input
+@load base/frameworks/sumstats
+@load ../../../frameworks/domain-tld/scripts
+module Alexa;
+
+export {
+    redef enum Notice::Type += {
+        Alexa::DNS_Not_In_Alexa_1M
+    };
+
+# path to alexa 1m file
+#const alexa_file = "/Users/gtrun/project/SA-tools/sensor/zeek/script/hardenedlinux-zeek-script/scripts/protocols/dns/alexa/top-1m.txt" &redef;
+const alexa_file = "/home/gtrun/project/hardenedlinux-zeek-script/scripts/protocols/dns/alexa/top-1m.txt" &redef;
+
+# hosts to ignore
+# global DNS::log_dns: event (rec: DNS::Info);
+option ignore_dns: set[string] = { } &redef;
+global alexa_table: set[string] = set();
+}
+
+# Record for domains in file above
+type Idx: record {
+    domain: string;
+    };
+
+# Table to store list of domains in file above
+global missed_alexa_dns_count: double;
+
+event zeek_init()
+    {
+    Input::add_table([$source=alexa_file,$mode=Input::REREAD,$name="alexa_table",$idx=Idx,$destination=alexa_table]);
+    local r1 = SumStats::Reducer($stream="missed_alexa_dns",
+	$apply=set(SumStats::SUM));
+SumStats::create([$name = "missed_alexa_dns",
+	$epoch = 10min,
+	$reducers = set(r1),
+	# Provide a threshold.
+	#$threshold = 5.0,
+	# Provide a callback to calculate a value from the result
+	# to check against the threshold field.
+
+	# Provide a callback for when a key crosses the threshold.
+	$epoch_result(ts: time, key: SumStats::Key, result: SumStats::Result) =
+{
+#	print fmt("%.0f",result["missed_alexa_dns"]$sum);
+
+if ("missed_alexa_dns" !in result)
+    return;
+    missed_alexa_dns_count = result["missed_alexa_dns"]$sum;
+
+    }]);
+    }
+event DNS::log_dns(rec: DNS::Info)
+
+    {
+    # Do not process the event if no query exists
+    if ( !rec?$query )
+        return;
+
+        # If necessary, clean the query so that it can be found in the list of Alexa domains
+
+        local not_ignore = T;
+        for (dns in ignore_dns)
+            {
+            if(dns in rec$query)
+                not_ignore = F;
+                }
+            local get_domain = DomainTLD::effective_domain(rec$query);
+            # Check if the query is not in the list of Alexa domains
+            if ( !(get_domain in alexa_table)  && !(rec$query in alexa_table) && not_ignore)
+                {
+                # Prepare the sub-message for the notice
+                # Include the domain queried in the sub-message
+                local sub_msg = fmt("%s",DomainTLD::effective_domain(rec$query));
+	            SumStats::observe("missed_alexa_dns",
+	            [$host=rec$id$orig_h],
+	            SumStats::Observation($num=1));
+
+
+            # Generate the notice
+            # Includes the connection flow, host intiating the lookup, domain queried, and query answers (if available)
+            ##! $msg=fmt("%s unknown domain. missed_count %0.f", rec$id$orig_h,missed_alexa_dns_count),
+    	    ##! FIXME : Need to fix bug that value used but not set
+            NOTICE([$note=Alexa::DNS_Not_In_Alexa_1M,
+                $msg=fmt("%s <-unknown domain", rec$id$orig_h),
+                $sub=sub_msg,
+                $id=rec$id,
+                $uid=rec$uid,
+                $identifier=cat(rec$id$orig_h,rec$query)]);
+            }
+        }
+```
+
+
+#### <span class="section-num">2.5.1</span> Log output {#log-output}
+
+```conf
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	notice
+#open	2020-11-22-23-33-00
+#fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	fuid	file_mime_type	file_desc	proto	note	msg	sub	src	dst	p	n	peer_descr	actions	suppress_for	remote_location.country_code	remote_location.region	remote_location.city	remote_location.latitude	remote_location.longitude
+#types	time	string	addr	port	addr	port	string	string	string	enum	enum	string	string	addr	addr	port	count	string	set[enum]	interval	string	string	string	double	double
+1416103911.914894	COKI1eJgpILqcMcJa	172.16.165.165	62720	172.16.165.2	53	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	bing.com	172.16.165.165	172.16.165.2	53	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103914.493624	CPrY4qw7JwiNMR5o1	172.16.165.165	51415	172.16.165.2	53	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	ciniholland.nl	172.16.165.165	172.16.165.2	53	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103916.905440	CsmVqF4JhpL0nnKxR	172.16.165.165	60914	172.16.165.2	53	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	adultbiz.in	172.16.165.165	172.16.165.2	53	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103930.530965	CkpscIdIuUgcg5NZ9	172.16.165.165	54787	172.16.165.2	53	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	24corp-shop.com	172.16.165.165	172.16.165.2	53	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103971.526505	C3viF14ZyF0T7KJU6g	172.16.165.165	50936	172.16.165.2	53	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	wpad.localdomain	172.16.165.165	172.16.165.2	53	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103981.549832	CE2b7n2SJFD1opJMv1	fe80::8db6:2c7:a019:4d88	53078	ff02::1:3	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	fe80::8db6:2c7:a019:4d88 <-unknown domain	wpad	fe80::8db6:2c7:a019:4d88	ff02::1:3	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103981.549832	CE2b7n2SJFD1opJMv1	fe80::8db6:2c7:a019:4d88	53078	ff02::1:3	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	fe80::8db6:2c7:a019:4d88 <-unknown domain	wpad	fe80::8db6:2c7:a019:4d88	ff02::1:3	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103981.549832	C7s4cj2RiW3FNuXaoa	172.16.165.165	63080	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	wpad	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103981.549832	C7s4cj2RiW3FNuXaoa	172.16.165.165	63080	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	wpad	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103992.637374	CetkZL2Q4R2aDdIbmd	172.16.165.165	137	172.16.165.2	137	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	WPAD	172.16.165.165	172.16.165.2	137	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103992.637374	CetkZL2Q4R2aDdIbmd	172.16.165.165	137	172.16.165.2	137	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	WPAD	172.16.165.165	172.16.165.2	137	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416103992.637374	CetkZL2Q4R2aDdIbmd	172.16.165.165	137	172.16.165.2	137	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	WPAD	172.16.165.165	172.16.165.2	137	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CAd4h88QGLoOgHDxd	fe80::8db6:2c7:a019:4d88	58036	ff02::1:3	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	fe80::8db6:2c7:a019:4d88 <-unknown domain	k34en6w3n-pc	fe80::8db6:2c7:a019:4d88	ff02::1:3	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CAd4h88QGLoOgHDxd	fe80::8db6:2c7:a019:4d88	58036	ff02::1:3	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	fe80::8db6:2c7:a019:4d88 <-unknown domain	k34en6w3n-pc	fe80::8db6:2c7:a019:4d88	ff02::1:3	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CnRHRN1FKoBV0f5pKi	172.16.165.165	57368	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	k34en6w3n-pc	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CnRHRN1FKoBV0f5pKi	172.16.165.165	57368	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	k34en6w3n-pc	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CPiywhZLCUNYEXIEc	fe80::8db6:2c7:a019:4d88	56675	ff02::1:3	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	fe80::8db6:2c7:a019:4d88 <-unknown domain	k34en6w3n-pc	fe80::8db6:2c7:a019:4d88	ff02::1:3	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CPiywhZLCUNYEXIEc	fe80::8db6:2c7:a019:4d88	56675	ff02::1:3	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	fe80::8db6:2c7:a019:4d88 <-unknown domain	k34en6w3n-pc	fe80::8db6:2c7:a019:4d88	ff02::1:3	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CjVmyi4hUCHlIMYNW2	172.16.165.165	58144	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	k34en6w3n-pc	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+1416104396.192075	CjVmyi4hUCHlIMYNW2	172.16.165.165	58144	224.0.0.252	5355	-	-	-	udp	Alexa::DNS_Not_In_Alexa_1M	172.16.165.165 <-unknown domain	k34en6w3n-pc	172.16.165.165	224.0.0.252	5355	-	-	Notice::ACTION_LOG	3600.000000	-	-	-	-	-
+#close	2020-11-22-23-33-01
+```
+
+
+## <span class="section-num">3</span> attachment analysis zip {#attachment-analysis-zip}
+
+
+### <span class="section-num">3.1</span> Log Ouput {#log-ouput}
+
+```conf
+#separator \x09
+#set_separator	,
+#empty_field	(empty)
+#unset_field	-
+#path	zip
+#open	2020-11-22-22-17-23
+#fields	ts	fid	content	valid	size	comp_size	mtime	crc	comp_method	encryption_method	flags
+#types	time	string	string	count	count	count	count	count	count	count	count
+1478375945.091326	F1VklK3evXm01AvZd	,Fl5Hxx.war,META-INF/application.xml	220	6519	6519	1606112243	0	0	0	102447920
+1478375945.091326	F1VklK3evXm01AvZd	,WEB-INF/,WEB-INF/web.xml,WEB-INF/classes/,WEB-INF/classes/metasploit/,WEB-INF/classes/metasploit/Payload.class,WEB-INF/classes/metasploit/PayloadServlet.class,WEB-INF/classes/metasploit.dat	220	6054	6054	1606112243	0	0	0	262380576
+#close	2020-11-22-22-17-23
+```
