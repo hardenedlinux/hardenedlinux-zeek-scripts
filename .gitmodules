@@ -1,0 +1,3 @@
+[submodule "scripts/frameworks/domain-tld"]
+	path = scripts/frameworks/domain-tld
+	url = https://github.com/sethhall/domain-tld.git
