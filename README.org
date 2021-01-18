@@ -13,21 +13,39 @@
 #+SELECT_TAGS: export
 #+EXCLUDE_TAGS: noexport
 * Buding Zeek with Nix package manager
-** Building Zeek's binary by nix package manager
+
+** Install Nix from packaged deb
+
+#+begin_src sh :async t :exports both :results output
+wget https://github.com/hardenedlinux/nix-fpm-multiuser/releases/download/Jan/nix_3.0.pre19700104.master_amd64.deb
+sudo dpkg -i nix_3.0.pre19700104.master_amd64.deb
+# reload shell env
+exec bash
+#+end_src
+
+** Building Zeek's binary by Nix
 #+begin_src sh :async t :exports both :results output
 git clone https://github.com/hardenedlinux/zeek-nix
-nix build
+nix-build
 #+end_src
 - deploy zeek with zeekctl
+- enable Nix's flakes feature( for commands such as ~nix build~ and ~nix develop~, ~nix run~ etc. )
+#+begin_src sh :async t :exports both :results output
+echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+#+end_src
+
 #+begin_src sh :async t :exports both :results output
 sh pre-run-zeekctl.sh
 nix run -c deploy
 #+end_src
-** Using Zeek's binary  via hardenedlinux binary cache machines(Speed up)
+
+** Using Zeek's binary via hardenedlinux binary cache machines(Speed up)
+- nix flakes
 #+begin_src sh :async t :exports both :results output
-nix build  --option sandbox false --option substituters "https://cache.nixos.org http://221.4.35.244:8301" --option trusted-public-keys "221.4.35.244:3ehdeUIC5gWzY+I7iF3lrpmxOMyEZQbZlcjOmlOVpeo= cache.nixos.org-1:${yourtrustkey check nix.conf }"
+nix build github:hardenedlinux/zeek-nix --option substituters "https://cache.nixos.org http://221.4.35.244:8301" --option trusted-public-keys "221.4.35.244:3ehdeUIC5gWzY+I7iF3lrpmxOMyEZQbZlcjOmlOVpeo="
 #+end_src
-** Using Nix zeek Script manager
+
+** Using Nix zeek Scripts which were locked rev for Users
 #+begin_src sh :async t :exports both :results output
 git clone https://github.com/hardenedlinux/zeek-nix
 cd zeek-scripts
@@ -35,7 +53,7 @@ nix-build
 #+end_src
 - ./reuslt/bin/<zeek-scirpts>
 
-* Deploy Zeek kafka topics with Nix home-manager on Debian(OS)
+* TODO Deploy Zeek kafka topics with Nix home-manager on Debian(OS) => Disnix
 - get more information: https://github.com/hardenedlinux/debian-nix-manager
 
 
