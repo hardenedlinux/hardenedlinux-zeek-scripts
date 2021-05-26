@@ -414,11 +414,11 @@
         "spicy-flake": "spicy-flake"
       },
       "locked": {
-        "lastModified": 1622016680,
-        "narHash": "sha256-TfHwyI7I+7nFIEaEUrgGQDjrNlxt7gYG7E2NcaLAAsk=",
+        "lastModified": 1622017759,
+        "narHash": "sha256-LdVB2O15V73zz92wZFf9+LY3cdFVVH5Qm/SVk1kJpjE=",
         "owner": "hardenedlinux",
         "repo": "nixpkgs-hardenedlinux",
-        "rev": "0fa79f610e85340966325983f2ddcb888bfb9bda",
+        "rev": "729e906b3de6496bde8f97faf4f24db5c96e8a21",
         "type": "github"
       },
       "original": {
