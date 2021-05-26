@@ -1,4 +1,4 @@
-name: "hardenedlinux nixpkgs"
+name: "CI"
 on:
   pull_request:
   push:
@@ -20,11 +20,12 @@ jobs:
         nix -Lv flake check
     - name: Build Zeek With Nix
       run: |
-        nix build ./#zeekTLS
+        nix -Lv build ./#zeekTLS
         nix develop -c zeek --version
     - name: Check Scripts
       run: |
-        zeek scripts/zeek-query.zeek >/dev/null 2>&1
+        nix develop -c zeek scripts/zeek-query.zeek >/dev/null 2>&1
+
     - uses: actions/cache@v2.1.5
       with:
         path: |

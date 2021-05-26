@@ -14,7 +14,7 @@
 #+EXCLUDE_TAGS: noexport
 * Buding Zeek with Nix package manager
 
-** Install Nix from packaged deb
+** Install Nix
 
 #+begin_src sh :async t :exports both :results output
 curl -L https://nixos.org/nix/install | daemon
@@ -45,12 +45,6 @@ sudo ./result/bin/zeek deploy
 ./result/bin/zeek status
 #+end_src
 
-** Using Zeek's binary via hardenedlinux binary cache machines(Speed up)
-#+begin_src sh :async t :exports both :results output
-cachix use nsm-data-analysis
-nix run github:hardenedlinux/zeek-nix#zeekTLS
-#+end_src
-
 ** Using Nix zeek Scripts which were locked rev for Users
 #+begin_src sh :async t :exports both :results output
 git clone https://github.com/hardenedlinux/zeek-nix
@@ -59,19 +53,7 @@ nix-build
 #+end_src
 - ./reuslt/bin/<zeek-scirpts>
 
-* TODO Deploy Zeek kafka topics with Nix home-manager on Debian(OS) => Disnix
-- get more information: https://github.com/hardenedlinux/debian-nix-manager
-
-
-#+begin_src sh :async t :exports both :results output
-home-manager switch
-deploy-home-manager -s ## to start each service of NSM status
-deploy-home-manager -c ## to check each service of NSM status
-#+end_src
-
-- Then Zeekctl deploy Zeek's cluster
-
-
+* DONE Deploy Zeek kafka topics with NixOS => Disnix
 or Do a kafka topics test.
 
 #+BEGIN_EXAMPLE

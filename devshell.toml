@@ -1,0 +1,5 @@
+[[commands]]
+name = "zeek-r"
+category = "tests"
+command = "zeek -r $1 $2"
+help = "zeek -r .pcap <scripts>"
