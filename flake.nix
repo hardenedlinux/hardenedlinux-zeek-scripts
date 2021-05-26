@@ -7,12 +7,13 @@
     flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
     devshell-flake.url = "github:numtide/devshell";
     zeek-flake.url = "github:hardenedlinux/zeek-nix";
+    nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
     nvfetcher-flake = {
       url = "github:berberman/nvfetcher";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, nixpkgs, flake-utils, flake-compat, devshell-flake, nvfetcher-flake, zeek-flake }:
+  outputs = { self, nixpkgs, flake-utils, flake-compat, devshell-flake, nvfetcher-flake, zeek-flake, nixpkgs-hardenedlinux }:
     {
       overlay = final: prev:
         {
@@ -29,6 +30,7 @@
               self.overlay
               devshell-flake.overlay
               zeek-flake.overlay
+              nixpkgs-hardenedlinux.overlay
             ];
             config = {
               allowUnsupportedSystem = true;
@@ -50,6 +52,9 @@
             ];
             packages = [
               zeekTLS
+              (pkgs.python3.withPackages (ps: with ps;[
+                btest
+              ]))
             ];
           };
         }
