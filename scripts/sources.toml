@@ -1,0 +1,12 @@
+# nvfetcher.toml
+[top-dns]
+src.git = "https://github.com/corelight/top-dns"
+fetch.github = "corelight/top-dns"
+
+[dns-axfr]
+src.git = "https://github.com/srozb/dns_axfr"
+fetch.github = "srozb/dns_axfr"
+
+[dns-tunnels]
+src.git = "https://github.com/hhzzk/dns-tunnels"
+fetch.github = "hhzzk/dns-tunnels"

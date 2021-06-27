@@ -3,21 +3,21 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/release-21.05";
     flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
     devshell-flake.url = "github:numtide/devshell";
-    zeek-flake.url = "github:hardenedlinux/zeek-nix";
+    zeek.url = "github:hardenedlinux/zeek-nix";
     nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
-    nvfetcher-flake = {
+    nvfetcher = {
       url = "github:berberman/nvfetcher";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, nixpkgs, flake-utils, flake-compat, devshell-flake, nvfetcher-flake, zeek-flake, nixpkgs-hardenedlinux }:
+  outputs = { self, nixpkgs, flake-utils, flake-compat, devshell-flake, nvfetcher, zeek, nixpkgs-hardenedlinux }:
     {
       overlay = final: prev:
         {
-          sources = (import ./sources.nix) { inherit (final) fetchurl fetchgit; };
+          hardenedlinux-zeek-scripts-sources = (import ./scripts/_sources/generated.nix) { inherit (final) fetchurl fetchgit; };
         };
     }
     //
@@ -29,8 +29,9 @@
             overlays = [
               self.overlay
               devshell-flake.overlay
-              zeek-flake.overlay
+              zeek.overlay
               nixpkgs-hardenedlinux.overlay
+              nvfetcher.overlay
             ];
             config = {
               allowUnsupportedSystem = true;
@@ -39,7 +40,7 @@
         in
         rec {
           packages = flake-utils.lib.flattenTree rec {
-            zeekTLS = pkgs.zeekTLS;
+            zeek-master = pkgs.zeek-master;
           };
 
           hydraJobs = {
@@ -51,10 +52,17 @@
               (devshell.importTOML ./devshell.toml)
             ];
             packages = [
-              zeekTLS
+              zeek-release
               (pkgs.python3.withPackages (ps: with ps;[
                 btest
               ]))
+            ];
+            commands = [
+              {
+                name = pkgs.nvfetcher-bin.pname;
+                help = pkgs.nvfetcher-bin.meta.description;
+                command = "cd $DEVSHELL_ROOT/scripts; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@; nixpkgs-fmt _sources";
+              }
             ];
           };
         }
