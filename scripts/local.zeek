@@ -2,7 +2,7 @@
 ##!
 ##! This file will not be overwritten when upgrading or reinstalling!
 @load ./zeek-kafka.zeek
-@load ../setting/local_net_field.zeek
+@load ./settings/local_net_field.zeek
 
 # This script logs which scripts were loaded during each run.
 @load misc/loaded-scripts

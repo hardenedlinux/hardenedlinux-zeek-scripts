@@ -18,6 +18,7 @@
       overlay = final: prev:
         {
           hardenedlinux-zeek-scripts-sources = (import ./scripts/_sources/generated.nix) { inherit (final) fetchurl fetchgit; };
+          hardenedlinux-zeek-scripts = prev.callPackage ./nix/hardenedlinux-zeek-scripts.nix { };
         };
     }
     //
@@ -40,7 +41,8 @@
         in
         rec {
           packages = flake-utils.lib.flattenTree rec {
-            zeek-master = pkgs.zeek-master;
+            zeek-release = pkgs.zeek-release;
+            hardenedlinux-zeek-scripts = pkgs.hardenedlinux-zeek-scripts;
           };
 
           hydraJobs = {
@@ -49,7 +51,7 @@
 
           devShell = with pkgs; devshell.mkShell {
             imports = [
-              (devshell.importTOML ./devshell.toml)
+              (devshell.importTOML ./nix/devshell.toml)
             ];
             packages = [
               zeek-release
