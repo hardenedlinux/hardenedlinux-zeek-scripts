@@ -15,6 +15,9 @@ jobs:
         extra_nix_config: |
           experimental-features = nix-command flakes
           system-features = nixos-test benchmark big-parallel kvm recursive-nix
+          substituters = https://zeek.cachix.org https://cache.nixos.org
+          trusted-public-keys = zeek.cachix.org-1:w590YE/k5sB26LSWvDCI3dccCXipBwyPenhBH2WNDWI= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+
     - name: Nix Flake Check
       run: |
         nix -Lv flake check
@@ -22,7 +25,7 @@ jobs:
       run: |
         nix -Lv build ./#zeek-release
         nix develop -c zeek --version
-    - name: Check Scripts
+    - name: Check Query Script
       run: |
         nix develop -c zeek scripts/zeek-query.zeek >/dev/null 2>&1
 
