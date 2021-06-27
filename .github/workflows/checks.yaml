@@ -20,7 +20,7 @@ jobs:
         nix -Lv flake check
     - name: Build Zeek With Nix
       run: |
-        nix -Lv build ./#zeek-master
+        nix -Lv build ./#zeek-release
         nix develop -c zeek --version
     - name: Check Scripts
       run: |
