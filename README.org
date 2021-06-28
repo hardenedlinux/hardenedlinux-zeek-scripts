@@ -2,16 +2,9 @@
 #+EMAIL: gtrunsec@hardenedlinux.org
 #+DATE: 10 August 2019
 #+DESCRIPTION:
-#+KEYWORDS:
+#+KEYWORDS: IDS Zeek
 #+LANGUAGE:  en cn
-#+SETUPFILE: ~/org-notes/setup/darkcss.local
-#+hugo_publishdate: (0 5)
-#+hugo_auto_set_lastmod: t
-#+HUGO_categories: 
-#+HUGO_tags: 
 #+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
-#+SELECT_TAGS: export
-#+EXCLUDE_TAGS: noexport
 * Buding Zeek with Nix package manager
 
 ** Install Nix
@@ -26,7 +19,7 @@ exec bash
 
 ** Building Zeek's binary by Nix
 #+begin_src sh :async t :exports both :results output
-git clone https://github.com/hardenedlinux/zeek-nix
+git clone https://github.com/hardenedlinux/zeek2nix
 nix-build
 # without clone
 nix run github:hardenedlinux/zeek-nix#zeekTLS
@@ -44,14 +37,6 @@ sudo ./result/bin/zeek deploy
 # check status
 ./result/bin/zeek status
 #+end_src
-
-** Using Nix zeek Scripts which were locked rev for Users
-#+begin_src sh :async t :exports both :results output
-git clone https://github.com/hardenedlinux/zeek-nix
-cd zeek-scripts
-nix-build
-#+end_src
-- ./reuslt/bin/<zeek-scirpts>
 
 * DONE Deploy Zeek kafka topics with NixOS => Disnix
 or Do a kafka topics test.

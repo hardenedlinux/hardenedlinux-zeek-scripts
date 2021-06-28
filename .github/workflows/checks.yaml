@@ -25,6 +25,8 @@ jobs:
       run: |
         nix -Lv build ./#zeek-release
         nix develop -c zeek --version
+    - name: Check Zeek Plugins
+      run: nix develop -c zeek -N
     - name: Check Query Script
       run: |
         nix develop -c zeek scripts/zeek-query.zeek >/dev/null 2>&1

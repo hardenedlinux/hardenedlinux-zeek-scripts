@@ -3,3 +3,20 @@ name = "zeek-r"
 category = "tests"
 command = "zeek -r $1 $2"
 help = "zeek -r .pcap <scripts>"
+
+
+[[commands]]
+name = "zq-text"
+category = "logs"
+command = '''
+        zq -f text "cut $1" $2
+        '''
+help = "zq -f text"
+
+[[commands]]
+name = "zq-zeek"
+category = "logs"
+command = '''
+        zq -f zeek "cut $1" $2
+        '''
+help = "zq -f zeek"
