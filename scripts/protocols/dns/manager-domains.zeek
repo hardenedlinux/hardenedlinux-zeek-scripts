@@ -1,9 +1,8 @@
-
 ##! Cluster::MANAGER
 ##! This script and concept stolen from [[https://github.com/dopheide-esnet/zeek-known-hosts-with-dns][dopheide-esnet/zeek-known-hosts-with-dns: This script expands the base known-hosts policy to include reverse DNS queries and syncs it across all workers.]]
 
 @load base/frameworks/cluster
-@load ../../frameworks/domain-tld/scripts
+@load ../../library #domain-tld
 @load ./alexa/alexa_validation.zeek
 @load ./dyndns.zeek
 module Known;

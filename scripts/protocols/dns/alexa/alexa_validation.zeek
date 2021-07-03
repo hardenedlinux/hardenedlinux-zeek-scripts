@@ -2,7 +2,7 @@
 @load base/frameworks/notice
 @load base/frameworks/input
 @load base/frameworks/sumstats
-@load ../../../frameworks/domain-tld/scripts
+@load ../../../library #domain-tld
 module Alexa;
 
 export {

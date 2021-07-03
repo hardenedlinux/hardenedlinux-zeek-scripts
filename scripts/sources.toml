@@ -10,3 +10,12 @@ fetch.github = "srozb/dns_axfr"
 [dns-tunnels]
 src.git = "https://github.com/hhzzk/dns-tunnels"
 fetch.github = "hhzzk/dns-tunnels"
+
+
+[zeek-known-hosts-with-dns]
+src.git = "https://github.com/dopheide-esnet/zeek-known-hosts-with-dns"
+fetch.github = "dopheide-esnet/zeek-known-hosts-with-dns"
+
+[zeek-domain-tld]
+src.git = "https://github.com/sethhall/domain-tld"
+fetch.github = "sethhall/domain-tld"

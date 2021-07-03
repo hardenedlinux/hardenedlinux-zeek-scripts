@@ -1,7 +1,7 @@
 #source frome https://github.com/corelight/top-dns/blob/master/scripts/main.bro
 @load base/utils/site
 @load base/frameworks/sumstats
-@load ../../frameworks/domain-tld/scripts
+@load ../../library #domain-tld
 module TopDNS;
 
 export {

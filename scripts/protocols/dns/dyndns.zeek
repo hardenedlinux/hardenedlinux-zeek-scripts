@@ -1,6 +1,5 @@
-
 @load base/frameworks/input/
-@load ../../frameworks/domain-tld/scripts
+@load ../../library #domain-tld
 module DynamicDNS;
 
 # This module is used to look for dynamic dns domains that are present in various kinds of
@@ -35,9 +34,7 @@ module DynamicDNS;
 export {
     redef enum Notice::Type += { DynDNS::HTTP, DynDNS::DNS, DynDNS::Traffic, DynDNS::SSL };
     option ignore_dyndns_fqdns: set[string] = { } &redef;
-    const dyndns_filename = "/home/gtrun/project/hardenedlinux-zeek-script/scripts/protocols/dns/dynamic_dns.txt" &redef;
-    #const dyndns_filename = "/Users/gtrun/project/SA-tools/sensor/zeek/script/hardenedlinux-zeek-script/scripts/protocols/dns/dynamic_dns.txt" &redef;
-
+    const dyndns_filename = "dynamic_dns.txt" &redef;
     global dyndns_domains: set[string] = set();
 
     }

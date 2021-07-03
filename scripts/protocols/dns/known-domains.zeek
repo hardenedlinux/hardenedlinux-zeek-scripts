@@ -1,5 +1,5 @@
 @load base/frameworks/cluster
-@load ../../frameworks/domain-tld/scripts
+@load ../../library #domain-tld
 @load ./alexa/alexa_validation.zeek
 @load ./dyndns.zeek
 module Known;

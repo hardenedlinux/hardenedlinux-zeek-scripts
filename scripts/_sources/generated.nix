@@ -40,4 +40,30 @@
     };
 
   };
+  zeek-domain-tld = {
+    pname = "zeek-domain-tld";
+    version = "6348921402150ca6571c25c71719c0e1e368f86f";
+    src = fetchgit {
+      url = "https://github.com/sethhall/domain-tld";
+      rev = "6348921402150ca6571c25c71719c0e1e368f86f";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "028ilp9pn5d3d94vygsr8y5qxkw0s3a1nzqwdxn3dxy0d7npca2l";
+    };
+
+  };
+  zeek-known-hosts-with-dns = {
+    pname = "zeek-known-hosts-with-dns";
+    version = "2fc60e6280442e4d8970d2aa2d93807712ce1855";
+    src = fetchgit {
+      url = "https://github.com/dopheide-esnet/zeek-known-hosts-with-dns";
+      rev = "2fc60e6280442e4d8970d2aa2d93807712ce1855";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "1fv49b3mj4rc0h39hw50qfvykxmm1whajnsl0122zlmn3bgdnf5l";
+    };
+
+  };
 }

@@ -9,10 +9,7 @@
     zeek2nix.url = "github:hardenedlinux/zeek-nix";
     spicy-with-nix-flake.url = "github:GTrunSec/spicy-with-nix-flake";
     nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
-    nvfetcher = {
-      url = "github:berberman/nvfetcher";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nvfetcher = { url = "github:berberman/nvfetcher"; };
   };
   outputs =
     { self
@@ -77,6 +74,11 @@
               name = pkgs.nvfetcher-bin.pname;
               help = pkgs.nvfetcher-bin.meta.description;
               command = "cd $DEVSHELL_ROOT/scripts; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@; nixpkgs-fmt _sources";
+            }
+            {
+              name = "zeek-with-dns";
+              help = "launch zeek with protocols/dns scirpts";
+              command = "${zeek-release}/bin/zeek ${hardenedlinux-zeek-scripts}/protocols/dns $@";
             }
           ];
         };

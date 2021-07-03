@@ -20,3 +20,19 @@ command = '''
         zq -f zeek "cut $1" $2
         '''
 help = "zq -f zeek"
+
+
+[[commands]]
+name = "clean-all"
+category = "logs"
+command = '''
+        rm -rf *.log
+        '''
+help = "clean all of * logs"
+
+
+[[commands]]
+name = "hardenedlinux-zeek-scripts"
+category = "pkgs"
+command = "nix -Lv build ./#hardenedlinux-zeek-scripts"
+help = "build hardenedlinux-zeek-scripts"

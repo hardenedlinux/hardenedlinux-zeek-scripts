@@ -1,4 +1,6 @@
+@load ../library #known-dns
 
+redef Site::local_nets += { 87.0.0.0/8 };
 ##! TODO // Broker sync link to vlan-info
 
 # redef vlanlist += {
@@ -7,8 +9,6 @@
 # [102] = [$description="west",$ipv4net=10.16.0.0/24,$ipv6net=[2001:0468:1f07:000d::]/64,$location="west",field = "#3 jiaoxue"],
 # [103] = [$description="east",$ipv4net=10.10.0.0/24,$ipv6net=[2001:0468:1f07:f00e::]/64,$location="east",field = "#4 jiaoxue"]
 # }
-@load ../scripts/protocols/conn/known-hosts-with-dns.zeek
 
-redef Site::local_nets += { 87.0.0.0/8 };
 
 #redef Known::use_host_store = F;
