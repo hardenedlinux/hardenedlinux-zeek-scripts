@@ -25,7 +25,7 @@
     {
       overlay = final: prev:
         {
-          hardenedlinux-zeek-scripts-sources = (import ./scripts/_sources/generated.nix) { inherit (final) fetchurl fetchgit; };
+          hardenedlinux-zeek-scripts-sources = prev.callPackage ./nix/_sources/generated.nix { };
           hardenedlinux-zeek-scripts = prev.callPackage ./nix/hardenedlinux-zeek-scripts.nix { };
         };
     }
@@ -73,7 +73,7 @@
             {
               name = pkgs.nvfetcher-bin.pname;
               help = pkgs.nvfetcher-bin.meta.description;
-              command = "cd $DEVSHELL_ROOT/scripts; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@; nixpkgs-fmt _sources";
+              command = "cd $DEVSHELL_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@; nixpkgs-fmt _sources";
             }
             {
               name = "zeek-with-dns";
