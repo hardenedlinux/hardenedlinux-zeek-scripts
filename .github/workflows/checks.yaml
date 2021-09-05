@@ -2,6 +2,8 @@ name: "CI"
 on:
   pull_request:
   push:
+  schedule:
+    - cron: "0 * 1,7,14,21,28 * *"
 jobs:
   nix-tests:
     runs-on: ubuntu-latest
@@ -11,23 +13,52 @@ jobs:
         fetch-depth: 0
     - uses: cachix/install-nix-action@v13
       with:
-        install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210604_8e6ee1b/install
+        install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210823_af94b54/install
         extra_nix_config: |
           experimental-features = nix-command flakes
           system-features = nixos-test benchmark big-parallel kvm recursive-nix
-          substituters = https://zeek.cachix.org https://cache.nixos.org
-          trusted-public-keys = zeek.cachix.org-1:w590YE/k5sB26LSWvDCI3dccCXipBwyPenhBH2WNDWI= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+          extra-substituters = https://zeek.cachix.org
+          extra-trusted-public-keys = zeek.cachix.org-1:pI1yRThH7gSh0ty7WmMWXqYFYigjcXFwiGiaaMmVpfA=
+
 
     - name: Nix Flake Check
       run: |
         nix -Lv flake check
+
+    - name: Run nvfetcher
+      run: nix -Lv develop --command nvfetcher -l changelog
+
     - name: Build Zeek With Nix
       run: |
         nix -Lv build ./#zeek-release
-        nix develop -c zeek --version
+        nix -Lv develop -c zeek --version
+
     - name: Check Zeek Plugins
       run: nix develop -c zeek -N
+
     - name: Check Query Script
       run: |
-        nix develop -c zeek scripts/zeek-query.zeek >/dev/null 2>&1
+        nix -Lv develop -c zeek scripts/zeek-query.zeek >/dev/null 2>&1
 
+    - name: Build hardenedlinux-zeek-scripts
+      run: |
+        nix -Lv develop -c hardenedlinux-zeek-scripts
+        cat ./result/__load__.zeek
+
+    - name: COMMIT_MSG
+      run: |
+        changlog=$(find . -type f -name "changelog")
+        if [[ ! -z "$(cat $changlog)" ]]; then
+        echo "COMMIT_MSG<<EOF" >>$GITHUB_ENV
+        echo "$(cat $changlog)" >>$GITHUB_ENV
+        echo "EOF" >>$GITHUB_ENV
+        rm -rf $changlog
+        else
+        rm -rf $changlog
+        fi
+
+    - name: Commit changes
+      if: ${{ env.COMMIT_MSG != null }}
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: ${{ env.COMMIT_MSG }}

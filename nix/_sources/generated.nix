@@ -12,7 +12,7 @@
       leaveDotGit = false;
       sha256 = "0jf8xi7vb5lfbvrjrlpzzw7rrdcw7ikpw5azykb22h553xw5jjvf";
     };
-
+    
   };
   dns-tunnels = {
     pname = "dns-tunnels";
@@ -25,7 +25,19 @@
       leaveDotGit = false;
       sha256 = "0x5apg1ljlm1zw3p6p8xsilrb5n0z024as73cfhqr6q2xv56s2ic";
     };
-
+    
+  };
+  ja3 = {
+    pname = "ja3";
+    version = "1ea6f1dee4e2668d376905c5443b835bca5d2fd7";
+    src = fetchgit {
+      url = "https://github.com/salesforce/ja3";
+      rev = "1ea6f1dee4e2668d376905c5443b835bca5d2fd7";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "0985vq0aqy8ld66hi1p822qfalc6bn4vs06ykl8dhmvl028rpykm";
+    };
   };
   top-dns = {
     pname = "top-dns";
@@ -38,7 +50,7 @@
       leaveDotGit = false;
       sha256 = "14w6nmjalvh5jxwcd8hh86nlzr448nm6mfr5ny239naflb0p1jv4";
     };
-
+    
   };
   zeek-domain-tld = {
     pname = "zeek-domain-tld";
@@ -51,19 +63,18 @@
       leaveDotGit = false;
       sha256 = "028ilp9pn5d3d94vygsr8y5qxkw0s3a1nzqwdxn3dxy0d7npca2l";
     };
-
+    
   };
   zeek-known-hosts-with-dns = {
     pname = "zeek-known-hosts-with-dns";
-    version = "2fc60e6280442e4d8970d2aa2d93807712ce1855";
+    version = "e04c4a7b40cf758656b6e54ea365f3adceacebf0";
     src = fetchgit {
       url = "https://github.com/dopheide-esnet/zeek-known-hosts-with-dns";
-      rev = "2fc60e6280442e4d8970d2aa2d93807712ce1855";
+      rev = "e04c4a7b40cf758656b6e54ea365f3adceacebf0";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
-      sha256 = "1fv49b3mj4rc0h39hw50qfvykxmm1whajnsl0122zlmn3bgdnf5l";
+      sha256 = "1xfz13nbm1qwwn8lz37ddsz9jha54vibnpa95pvpb5cmczrmnxph";
     };
-
   };
 }

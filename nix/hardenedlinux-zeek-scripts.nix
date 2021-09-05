@@ -1,4 +1,13 @@
-{ stdenv, zeek-release, hardenedlinux-zeek-scripts-sources }:
+{ stdenv, lib, zeek-release, hardenedlinux-zeek-scripts-sources }:
+let
+  loadScripts = lib.concatStringsSep "\n" (map (f: "@load ${hardenedlinux-zeek-scripts-sources.${f}.src}/scripts") scripts);
+  scripts = [
+    "ja3"
+    "top-dns"
+    "dns-tunnels"
+    "dns-axfr"
+  ];
+in
 stdenv.mkDerivation rec {
   src = ../scripts;
   name = "hardenedlinux-zeek-script";
@@ -7,7 +16,17 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook preInstall
     cp -r $src $out
+    chmod +rw -R $out
+    cat <<EOF > $out/__load__.zeek
+    @load ./protocols
+    ${loadScripts}
+    EOF
 
+    #################
+    # Fixup Scripts #
+    #################
+    substituteInPlace $out/__load__.zeek \
+    --replace "${hardenedlinux-zeek-scripts-sources.ja3.src}/scripts" "${hardenedlinux-zeek-scripts-sources.ja3.src}/zeek"
     ##################
     # Public library #
     ##################
@@ -32,6 +51,7 @@ stdenv.mkDerivation rec {
     ###########
     substituteInPlace $out/tunnels/zeek-kafka.zeek \
     --replace "/usr/local/zeek/lib/zeek/plugins/" "${zeek-release}/lib/zeek/plugins/"
+
 
     runHook postInstall
   '';

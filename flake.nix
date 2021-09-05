@@ -10,6 +10,7 @@
     spicy-with-nix-flake.url = "github:GTrunSec/spicy-with-nix-flake";
     nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
     nvfetcher = { url = "github:berberman/nvfetcher"; };
+    gomod2nix.follows = "nixpkgs-hardenedlinux/gomod2nix";
   };
   outputs =
     { self
@@ -21,6 +22,7 @@
     , zeek2nix
     , spicy-with-nix-flake
     , nixpkgs-hardenedlinux
+    , gomod2nix
     }:
     {
       overlay = final: prev:
@@ -38,10 +40,11 @@
           overlays = [
             self.overlay
             devshell-flake.overlay
-            zeek2nix.overlay
             nixpkgs-hardenedlinux.overlay
             nvfetcher.overlay
             spicy-with-nix-flake.overlay
+            gomod2nix.overlay
+            (final: prev: { zeek-release = zeek2nix.packages."${prev.system}".zeek-release; })
           ];
           config = {
             allowUnsupportedSystem = true;
@@ -73,7 +76,7 @@
             {
               name = pkgs.nvfetcher-bin.pname;
               help = pkgs.nvfetcher-bin.meta.description;
-              command = "cd $DEVSHELL_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@; nixpkgs-fmt _sources";
+              command = "cd $DEVSHELL_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@";
             }
             {
               name = "zeek-with-dns";
