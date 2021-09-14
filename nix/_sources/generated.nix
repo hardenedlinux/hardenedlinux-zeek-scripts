@@ -12,7 +12,6 @@
       leaveDotGit = false;
       sha256 = "0jf8xi7vb5lfbvrjrlpzzw7rrdcw7ikpw5azykb22h553xw5jjvf";
     };
-    
   };
   dns-tunnels = {
     pname = "dns-tunnels";
@@ -25,7 +24,6 @@
       leaveDotGit = false;
       sha256 = "0x5apg1ljlm1zw3p6p8xsilrb5n0z024as73cfhqr6q2xv56s2ic";
     };
-    
   };
   ja3 = {
     pname = "ja3";
@@ -39,6 +37,30 @@
       sha256 = "0985vq0aqy8ld66hi1p822qfalc6bn4vs06ykl8dhmvl028rpykm";
     };
   };
+  scan-NG = {
+    pname = "scan-NG";
+    version = "80b0c3b9857336e0417c6bc7f92938445b9df48f";
+    src = fetchgit {
+      url = "https://github.com/initconf/scan-NG";
+      rev = "80b0c3b9857336e0417c6bc7f92938445b9df48f";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "0vjf2b2sf9m2ii7anw512m3md2s7zzfpdpigk13q62jmnir004m6";
+    };
+  };
+  sip-attacks = {
+    pname = "sip-attacks";
+    version = "1b8c5feb73a732e2ddd8419159f1cbd24c8b9f69";
+    src = fetchgit {
+      url = "https://github.com/initconf/sip-attacks";
+      rev = "1b8c5feb73a732e2ddd8419159f1cbd24c8b9f69";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "1n9vdmc8l0vz9wmdy3b866vf0i4i0y43av3al2df4yrf49mjxsrx";
+    };
+  };
   top-dns = {
     pname = "top-dns";
     version = "d08b1a5665e47ff983debe5a85c0dc8b52aee019";
@@ -50,7 +72,6 @@
       leaveDotGit = false;
       sha256 = "14w6nmjalvh5jxwcd8hh86nlzr448nm6mfr5ny239naflb0p1jv4";
     };
-    
   };
   zeek-domain-tld = {
     pname = "zeek-domain-tld";
@@ -63,7 +84,6 @@
       leaveDotGit = false;
       sha256 = "028ilp9pn5d3d94vygsr8y5qxkw0s3a1nzqwdxn3dxy0d7npca2l";
     };
-    
   };
   zeek-known-hosts-with-dns = {
     pname = "zeek-known-hosts-with-dns";
@@ -75,6 +95,30 @@
       deepClone = false;
       leaveDotGit = false;
       sha256 = "1xfz13nbm1qwwn8lz37ddsz9jha54vibnpa95pvpb5cmczrmnxph";
+    };
+  };
+  zeek-os-package-tracking = {
+    pname = "zeek-os-package-tracking";
+    version = "5345b12e6ba2cf1990fc5510aa649a6c234b82bb";
+    src = fetchgit {
+      url = "https://github.com/0xxon/zeek-os-package-tracking";
+      rev = "5345b12e6ba2cf1990fc5510aa649a6c234b82bb";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "1nsfnr761z7bhv414pky5lmdh9hwli5030x6l44hnknsisp23amz";
+    };
+  };
+  zeek-sumstats-counttable = {
+    pname = "zeek-sumstats-counttable";
+    version = "4340348f23b5e807f2f8eae835eb02170efee347";
+    src = fetchgit {
+      url = "https://github.com/0xxon/zeek-sumstats-counttable";
+      rev = "4340348f23b5e807f2f8eae835eb02170efee347";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sha256 = "0ngyjscwzc2j6qqm5myk7fn2s8j8hx82j12dmaxnivpqi6xbkcav";
     };
   };
 }

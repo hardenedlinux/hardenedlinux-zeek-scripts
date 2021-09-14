@@ -1,12 +1,12 @@
 @load base/frameworks/cluster
-@load ../../library #domain-tld
+@load packages/domain-tld
 @load ./alexa/alexa_validation.zeek
 @load ./dyndns.zeek
 module Known;
 
 export {
 	redef enum Log::ID += { DOMAIN_LOG };
-	
+
 	type DomainsInfo: record {
 
 		ts:           	 	time   		&log;
@@ -19,14 +19,14 @@ export {
 
 		found_dynamic:		bool 		&log;
 	};
-	
+
 
 	## Toggles between different implementations of this script.
 	## When true, use a Broker data store, else use a regular Zeek set
 	## with keys uniformly distributed over proxy nodes in cluster
 	## operation.
 	const use_domain_store = T &redef;
-	
+
 
 	global domain_store: Cluster::StoreInfo;
 
@@ -41,15 +41,15 @@ export {
 	## :zeek:see:`Known::domain_store`.
 	option domain_store_timeout = 15sec;
 
-	## The set of all known domains to store for preventing duplicate 
-	## logging. It can also be used from other scripts to 
-	## inspect if a certificate has been seen in use. The string value 
+	## The set of all known domains to store for preventing duplicate
+	## logging. It can also be used from other scripts to
+	## inspect if a certificate has been seen in use. The string value
 	## in the set is for storing the DER formatted certificate' SHA1 domain.
 	##
 	## In cluster operation, this set is uniformly distributed across
 	## proxy nodes.
 	global domains: set[string] &create_expire=1day &redef;
-	
+
 	## Event that can be handled to access the loggable record as it is sent
 	## on to the logging framework.
 	global log_known_domains: event(rec: DomainsInfo);
@@ -68,7 +68,7 @@ event Known::domain_found(info: DomainsInfo)
 	if ( ! Known::use_domain_store )
 		return;
 
-	
+
 
 	when ( local r = Broker::put_unique(Known::domain_store$store, info$domain,
 	T, Known::domain_store_expiry) )
@@ -180,9 +180,9 @@ event DNS::log_dns(rec: DNS::Info)
 			if(split_domain == dns)
 			not_ignore = F;
 			}
-		local dynamic = T;	
+		local dynamic = T;
 		if (split_domain !in DynamicDNS::dyndns_domains)
-			dynamic = F;    
+			dynamic = F;
 		if ( !(split_domain in Alexa::alexa_table) && not_ignore)
 			{
 				local info = DomainsInfo($ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = F, $found_dynamic = dynamic);
@@ -193,6 +193,6 @@ event DNS::log_dns(rec: DNS::Info)
 				info = DomainsInfo($ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = T, $found_dynamic = dynamic);
 				event Known::domain_found(info);
 			}
-		}	
-	}		
+		}
+	}
 }

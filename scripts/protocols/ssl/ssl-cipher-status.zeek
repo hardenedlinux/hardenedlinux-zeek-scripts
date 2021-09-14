@@ -8,8 +8,8 @@
 # Michal Purzynski mpurzynski@mozilla.com
 # Modtified by hardenedlinux
 @load base/protocols/ssl
+@load packages/zeek-sumstats-counttable
 
-@load ../../frameworks/countabble.zeek
 module SSLCipherStat;
 
 export {

@@ -2,14 +2,14 @@
 ##! This script and concept stolen from [[https://github.com/dopheide-esnet/zeek-known-hosts-with-dns][dopheide-esnet/zeek-known-hosts-with-dns: This script expands the base known-hosts policy to include reverse DNS queries and syncs it across all workers.]]
 
 @load base/frameworks/cluster
-@load ../../library #domain-tld
+@load packages/domain-tld
 @load ./alexa/alexa_validation.zeek
 @load ./dyndns.zeek
 module Known;
 
 export {
 	redef enum Log::ID += { DOMAIN_LOG };
-	
+
 	type DomainsInfo: record {
 
 		ts:           	 	time   		&log;
@@ -22,14 +22,14 @@ export {
 
 		found_dynamic:		bool 		&log;
 	};
-	
+
 
 	## Toggles between different implementations of this script.
 	## When true, use a Broker data store, else use a regular Zeek set
 	## with keys uniformly distributed over proxy nodes in cluster
 	## operation.
 	const use_domain_store = T &redef;
-	
+
 
 	global domain_store: Cluster::StoreInfo;
 
@@ -44,9 +44,9 @@ export {
 	## :zeek:see:`Known::domain_store`.
 	option domain_store_timeout = 15sec;
 
-	## The set of all known domains to store for preventing duplicate 
-	## logging. It can also be used from other scripts to 
-	## inspect if a certificate has been seen in use. The string value 
+	## The set of all known domains to store for preventing duplicate
+	## logging. It can also be used from other scripts to
+	## inspect if a certificate has been seen in use. The string value
 	## in the set is for storing the DER formatted certificate' SHA1 domain.
 	##
 	## In cluster operation, this set is uniformly distributed across
@@ -97,7 +97,7 @@ event Known::domain_found(info: DomainsInfo)
 			# the manager's Known::stored_hosts and then sending the table to the workers all at once
 			schedule 30sec {Known::send_known()};
 		@endif
-	@endif	
+	@endif
     }
 
 event known_domain_add(info: DomainsInfo)
@@ -162,13 +162,13 @@ event DNS::log_dns(rec: DNS::Info)
 			return;
 		local dynamic = T;
 		if (split_domain !in DynamicDNS::dyndns_domains)
-				dynamic = F;    
+				dynamic = F;
 		if ( !(split_domain in Alexa::alexa_table))
 			{
 				local info = DomainsInfo($ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = F, $found_dynamic = dynamic);
 				event Known::domain_found(info);
 				@if ( Cluster::is_enabled() && Cluster::local_node_type() == Cluster::WORKER )
-					Broker::publish(Cluster::manager_topic,Known::domian_found,[$ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = F, $found_dynamic = dynamic]);				
+					Broker::publish(Cluster::manager_topic,Known::domian_found,[$ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = F, $found_dynamic = dynamic]);
 				@endif
 			}
 			else
@@ -176,9 +176,9 @@ event DNS::log_dns(rec: DNS::Info)
 				info = DomainsInfo($ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = T, $found_dynamic = dynamic);
 				event Known::domain_found(info);
 				@if ( Cluster::is_enabled() && Cluster::local_node_type() == Cluster::WORKER )
-					Broker::publish(Cluster::manager_topic,Known::domain_found,[$ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = T, $found_dynamic = dynamic]);				
+					Broker::publish(Cluster::manager_topic,Known::domain_found,[$ts = network_time(), $host = host, $domain = split_domain, $found_in_alexa = T, $found_dynamic = dynamic]);
 				@endif
 			}
 		}
-	}		
+	}
 }

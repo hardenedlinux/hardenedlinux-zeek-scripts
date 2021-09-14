@@ -1,4 +1,6 @@
-@load ../library #known-dns
+##! known-dns
+@load packages/known-hosts-with-dns
+
 
 redef Site::local_nets += { 87.0.0.0/8 };
 ##! TODO // Broker sync link to vlan-info

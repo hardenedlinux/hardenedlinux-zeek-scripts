@@ -1,4 +1,4 @@
-@load ../../frameworks/countabble.zeek
+@load packages/zeek-sumstats-counttable
 
 module HSSH;
 

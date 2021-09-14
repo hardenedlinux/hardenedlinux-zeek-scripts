@@ -41,7 +41,7 @@ event rdp_client_core_data (c: connection , data: RDP::ClientCoreData ) &priorit
 {
 }
 
-##X.224
+# X.224
 event rdp_connect_request (c: connection , cookie: string ){
 
 }

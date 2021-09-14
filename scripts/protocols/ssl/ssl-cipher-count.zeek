@@ -3,10 +3,8 @@
 # TLS cipher suites for each host in the local network.
 # Original Scirpt:https://github.com/0xxon/bro-sumstats-counttable
 # modified by GTrunsec
-
 @load base/protocols/ssl
-@load ../../frameworks/countabble.zeek
-
+@load packages/zeek-sumstats-counttable
 
 module SSLCiphers;
 
@@ -70,6 +68,6 @@ SumStats::observe("ciphers.conns", [$host=c$id$resp_h], []);
 
 for ( i in ciphers )
 	local cipher_str = SSL::cipher_desc[ciphers[i]];
-	
+
 	SumStats::observe("ciphers.ciphers", [$host=c$id$resp_h], [$str=cipher_str]);
   }

@@ -1,1 +1,1 @@
-@load ./track-dhcp.bro
+@load ./track-dhcp.zeek

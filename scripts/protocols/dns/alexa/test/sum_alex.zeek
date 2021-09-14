@@ -2,7 +2,10 @@
 @load base/frameworks/notice
 @load base/frameworks/input
 @load base/frameworks/sumstats
-@load ../../../frameworks/domain-tld/scripts
+@load packages/domain-tld
+
+
+
 module Alexa;
 
 export {
@@ -11,8 +14,7 @@ export {
    };
 
   # path to alexa 1m file
-  const alexa_file = "/Users/gtrun/project/SA-tools/sensor/zeek/script/hardenedlinux-bro-script/scripts/protocols/dns/alexa/top-1m.txt" &redef;
-  #const alexa_file = "./top-1m.txt" &redef;
+  const alexa_file = "./top-1m.txt" &redef;
 
   # hosts to ignore
   const ignore_dns: set[string] = { "WORKGROUP", "DOMEX"} &redef;
@@ -74,7 +76,7 @@ if ( !(get_domain in alexa_table)  && !(rec$query in alexa_table) && not_ignore)
 	SumStats::Key($host=rec$id$orig_h),
 	SumStats::Observation($str=rec$query));
 
-  
+
   # Generate the notice
   # Includes the connection flow, host intiating the lookup, domain queried, and query answers (if available)
     NOTICE([$note=Alexa::DNS_Not_In_Alexa_1M,

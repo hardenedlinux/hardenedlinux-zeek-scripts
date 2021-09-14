@@ -15,6 +15,20 @@ fetch.github = "srozb/dns_axfr"
 src.git = "https://github.com/hhzzk/dns-tunnels"
 fetch.github = "hhzzk/dns-tunnels"
 
+[zeek-os-package-tracking]
+src.git = "https://github.com/0xxon/zeek-os-package-tracking"
+fetch.github = "0xxon/zeek-os-package-tracking"
+
+[scan-NG]
+src.git = "https://github.com/initconf/scan-NG"
+fetch.github = "initconf/scan-NG"
+
+
+[sip-attacks]
+src.git = "https://github.com/initconf/sip-attacks"
+fetch.github = "initconf/sip-attacks"
+
+
 ##################
 # Public library #
 ##################
@@ -25,3 +39,7 @@ fetch.github = "dopheide-esnet/zeek-known-hosts-with-dns"
 [zeek-domain-tld]
 src.git = "https://github.com/sethhall/domain-tld"
 fetch.github = "sethhall/domain-tld"
+
+[zeek-sumstats-counttable]
+src.git = "https://github.com/0xxon/zeek-sumstats-counttable"
+fetch.github = "0xxon/zeek-sumstats-counttable"

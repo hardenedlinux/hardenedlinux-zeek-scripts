@@ -1,15 +1,16 @@
-@load base/frameworks/input/
-@load ../../library #domain-tld
-module DynamicDNS;
+@load base/frameworks/input
+@load packages/domain-tld
 
+
+module DynamicDNS;
 # This module is used to look for dynamic dns domains that are present in various kinds of
 # network traffic. For HTTP, the HOST header value is checked, for DNS the query request value
 # is checked, and for SSL the server value is checked. Since dynamic DNS domains often take
-# the format of <user defined>.domain.tld the value in the host header is stripped of everything 
-# to the left of domain.tld, in the event that doesn't match the check is expanded to 
+# the format of <user defined>.domain.tld the value in the host header is stripped of everything
+# to the left of domain.tld, in the event that doesn't match the check is expanded to
 # something.domain.tld.
 #
-# A good place to get started is malware-domains dyndns list, the following will put it in the 
+# A good place to get started is malware-domains dyndns list, the following will put it in the
 # right format for this script:
 # wget "http://www.malware-domains.com/files/dynamic_dns.zip" && unzip -c dynamic_dns.zip | tail -n +4 | grep -v ^# | grep -v ^$ | cut -f 1 > tmp.txt && echo -e "#fields\tdomain" > dynamic_dns.txt && cat tmp.txt | cut -d '#' -f 1 >> dynamic_dns.txt && rm tmp.txt dynamic_dns.zip
 #
@@ -23,7 +24,7 @@ module DynamicDNS;
 ##Updated for Bro 2.2 - byte_len is depricated and replaced with | | (2 pipes)
 
 ## Brian Kellogg 12/2/2014
-## Updated for Bro 2.3 - DNS::do_reply is now a hook not an event, 
+## Updated for Bro 2.3 - DNS::do_reply is now a hook not an event,
 ## Added logic to check for conn$dns field before looking for conn$dns$query field - if ((c?$dns) && (c$dns?$query))
 
 ## Mike 8/17/2015
@@ -41,7 +42,7 @@ export {
 
 type Idx: record {
     domain: string;
-    
+
 };
 
 #global dyndns_domains: set[string] = set();
@@ -78,7 +79,7 @@ event http_header(c: connection, is_orig: bool, name: string, value: string)
         if ( domain in dyndns_domains )
             {
             NOTICE([$note=DynDNS::HTTP, $msg="Found Dynamic DNS Hostname",
-                    $sub=value, $conn=c, $suppress_for=30mins, 
+                    $sub=value, $conn=c, $suppress_for=30mins,
                     $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
             return;
             }
@@ -93,14 +94,14 @@ hook DNS::do_reply(c: connection, msg: dns_msg, ans: dns_answer, reply: string)
     local dyn = F;
     local value: string;
     if ((c?$dns) && (c$dns?$query))
-        { 
+        {
         value = c$dns$query;
         if ( value in ignore_dyndns_fqdns )
             return;
         local domain = DomainTLD::effective_domain(value);
         if ( domain in dyndns_domains )
             {
-            NOTICE([$note=DynDNS::DNS, $msg="Found Dynamic DNS Hostname", 
+            NOTICE([$note=DynDNS::DNS, $msg="Found Dynamic DNS Hostname",
                     $sub=value, $conn=c, $suppress_for=30mins,
                     $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
             dyn = T;
@@ -128,7 +129,7 @@ event ssl_established(c: connection)
     if ( ! dyndnslist_ready)
         return;
 
-    if(c$ssl?$server_name) 
+    if(c$ssl?$server_name)
         {
         local value = c$ssl$server_name;
         if ( value in ignore_dyndns_fqdns )
@@ -136,7 +137,7 @@ event ssl_established(c: connection)
         local domain = DomainTLD::effective_domain(value);
 
         if ( domain in dyndns_domains )
-            NOTICE([$note=DynDNS::SSL, $msg="Found Dynamic DNS Hostname", 
+            NOTICE([$note=DynDNS::SSL, $msg="Found Dynamic DNS Hostname",
                     $sub=value, $conn=c, $suppress_for=30mins,
                     $identifier=cat(c$id$resp_h,c$id$resp_p,c$id$orig_h,value)]);
         }
@@ -146,7 +147,7 @@ event Conn::log_conn(rec: Conn::Info)
     {
     if ( ! dyndnslist_ready)
         return;
-    
+
     local ip = rec$id$resp_h;
     local c: connection;
     local cid: conn_id;
@@ -157,7 +158,7 @@ event Conn::log_conn(rec: Conn::Info)
     c$id$resp_p = rec$id$resp_p;
     c$id$orig_p = rec$id$orig_p;
     if ( ip in dyndns_resolved_ips )
-        NOTICE([$note=DynDNS::Traffic, $msg="Traffic to a DynDNS resolved IP", 
+        NOTICE([$note=DynDNS::Traffic, $msg="Traffic to a DynDNS resolved IP",
                 $sub=dyndns_resolved_ips[ip], $conn=c, $suppress_for=30mins,
                 $identifier=cat(c$id$orig_h,c$id$resp_h,c$id$resp_p)]);
     }

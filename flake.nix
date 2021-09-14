@@ -2,15 +2,16 @@
   description = "Hardenedlinux Zeek Scripts Repo";
 
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "nixpkgs/release-21.05";
     flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
-    devshell-flake.url = "github:numtide/devshell";
+
     zeek2nix.url = "github:hardenedlinux/zeek-nix";
-    spicy-with-nix-flake.url = "github:GTrunSec/spicy-with-nix-flake";
+    flake-utils.follows = "zeek2nix/flake-utils";
+    devshell-flake.follows = "zeek2nix/devshell-flake";
+
     nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
-    nvfetcher = { url = "github:berberman/nvfetcher"; };
     gomod2nix.follows = "nixpkgs-hardenedlinux/gomod2nix";
+    nvfetcher = { url = "github:berberman/nvfetcher"; };
   };
   outputs =
     { self
@@ -20,7 +21,6 @@
     , devshell-flake
     , nvfetcher
     , zeek2nix
-    , spicy-with-nix-flake
     , nixpkgs-hardenedlinux
     , gomod2nix
     }:
@@ -42,7 +42,6 @@
             devshell-flake.overlay
             nixpkgs-hardenedlinux.overlay
             nvfetcher.overlay
-            spicy-with-nix-flake.overlay
             gomod2nix.overlay
             (final: prev: { zeek-release = zeek2nix.packages."${prev.system}".zeek-release; })
           ];

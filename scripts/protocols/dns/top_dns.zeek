@@ -1,7 +1,8 @@
 #source frome https://github.com/corelight/top-dns/blob/master/scripts/main.bro
 @load base/utils/site
 @load base/frameworks/sumstats
-@load ../../library #domain-tld
+@load packages/domain-tld
+
 module TopDNS;
 
 export {
@@ -12,7 +13,7 @@ export {
 	option logging_interval = 15mins &redef;
 
 	## If you would like to measure trimmed "effective domains".
-	## This will take something like "www.google.co.uk" and only 
+	## This will take something like "www.google.co.uk" and only
 	## use "google.co.uk" as the measured value.
 	option use_trimmed_domain = F &redef;
 

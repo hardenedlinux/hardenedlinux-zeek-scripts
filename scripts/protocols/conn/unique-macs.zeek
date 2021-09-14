@@ -1,6 +1,4 @@
-
-@load ../../frameworks/countabble.zeek
-
+@load packages/zeek-sumstats-counttable
 
 module UniqueMacs;
 
@@ -25,7 +23,7 @@ global log_conn_count: event(rec: Info);
 
 event zeek_init()
   {
-  
+
   Log::create_stream(UniqueMacs::LOG, [$columns=Info, $ev=log_conn_count, $path="unique-macs"]);
 
   local r1 = SumStats::Reducer($stream="unique.macs", $apply=set(SumStats::COUNTTABLE));
@@ -51,8 +49,8 @@ event DHCP::log_dhcp(rec: DHCP::Info) {
   if ( rec$assigned_addr in watched_nets ) {
 
     local net: subnet;
-    
-    for ( net in watched_nets ) { 
+
+    for ( net in watched_nets ) {
 
   if ( rec?$assigned_addr && (rec$assigned_addr in watched_nets )) {
 

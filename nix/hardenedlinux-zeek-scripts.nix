@@ -1,18 +1,21 @@
-{ stdenv, lib, zeek-release, hardenedlinux-zeek-scripts-sources }:
+{ stdenv, lib, ripgrep, zeek-release, hardenedlinux-zeek-scripts-sources }:
 let
   loadScripts = lib.concatStringsSep "\n" (map (f: "@load ${hardenedlinux-zeek-scripts-sources.${f}.src}/scripts") scripts);
   scripts = [
     "ja3"
-    "top-dns"
-    "dns-tunnels"
+    # TODO: fix
+    # "top-dns"
+    # "dns-tunnels"
     "dns-axfr"
+    "scan-NG"
+    "sip-attacks"
   ];
 in
 stdenv.mkDerivation rec {
   src = ../scripts;
   name = "hardenedlinux-zeek-script";
   phases = [ "installPhase" ];
-  buildInputs = [ zeek-release ];
+  buildInputs = [ zeek-release ripgrep ];
   installPhase = ''
     runHook preInstall
     cp -r $src $out
@@ -30,14 +33,27 @@ stdenv.mkDerivation rec {
     ##################
     # Public library #
     ##################
-    substituteInPlace $out/library/__load__.zeek \
+    for file in $(rg -l -- "packages/domain-tld" $out); do
+    substituteInPlace $file \
     --replace "packages/domain-tld" "${hardenedlinux-zeek-scripts-sources.zeek-domain-tld.src}/scripts"
-
+    done
+    ############################
+    # zeek-sumstats-counttable #
+    ############################
+    for file in $(rg -l -- "packages/zeek-sumstats-counttable" $out); do
+    substituteInPlace $file \
+    --replace "packages/zeek-sumstats-counttable" "${hardenedlinux-zeek-scripts-sources.zeek-sumstats-counttable.src}"
+    done
+    #############################
+    # zeek-known-hosts-with-dns #
+    #############################
+    for file in $(rg -l -- "packages/known-hosts-with-dns" $out); do
+    substituteInPlace $file \
+    --replace "packages/known-hosts-with-dns" "${hardenedlinux-zeek-scripts-sources.zeek-known-hosts-with-dns.src}/scripts"
+    done
     ####################
     # protocols -> DNS #
     ####################
-    substituteInPlace $out/protocols/dns/__load__.zeek \
-    --replace "packages/known-hosts-with-dns" "${hardenedlinux-zeek-scripts-sources.zeek-known-hosts-with-dns.src}/scripts"
     ## feeds -> top-1m (replace to nix/store/<path>)
     substituteInPlace $out/protocols/dns/alexa/alexa_validation.zeek \
     --replace "top-1m.txt" "$out/protocols/dns/alexa/top-1m.txt"
