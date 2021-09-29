@@ -43,3 +43,11 @@ fetch.github = "sethhall/domain-tld"
 [zeek-sumstats-counttable]
 src.git = "https://github.com/0xxon/zeek-sumstats-counttable"
 fetch.github = "0xxon/zeek-sumstats-counttable"
+
+
+#######
+# CVE #
+#######
+[CVE-2021-38647]
+src.git = "https://github.com/corelight/CVE-2021-38647"
+fetch.github = "corelight/CVE-2021-38647"

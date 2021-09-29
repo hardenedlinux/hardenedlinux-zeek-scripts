@@ -1,0 +1,20 @@
+[devshell]
+packages = [ "zed" ]
+
+
+
+[[commands]]
+name = "zq-text"
+category = "logs"
+command = '''
+        zq -f text "cut $1" $2
+        '''
+help = "zq -f text"
+
+[[commands]]
+name = "zq-zeek"
+category = "logs"
+command = '''
+        zq -f zeek "cut $1" $2
+        '''
+help = "zq -f zeek"

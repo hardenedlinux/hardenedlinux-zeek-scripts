@@ -8,10 +8,10 @@
     zeek2nix.url = "github:hardenedlinux/zeek-nix";
     flake-utils.follows = "zeek2nix/flake-utils";
     devshell-flake.follows = "zeek2nix/devshell-flake";
+    nvfetcher.follows = "zeek2nix/nvfetcher";
 
     nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
     gomod2nix.follows = "nixpkgs-hardenedlinux/gomod2nix";
-    nvfetcher = { url = "github:berberman/nvfetcher"; };
   };
   outputs =
     { self
@@ -43,7 +43,10 @@
             nixpkgs-hardenedlinux.overlay
             nvfetcher.overlay
             gomod2nix.overlay
-            (final: prev: { zeek-release = zeek2nix.packages."${prev.system}".zeek-release; })
+            (final: prev: {
+              zeek-release = zeek2nix.packages."${prev.system}".zeek-release;
+              zeek-latest = zeek2nix.packages."${prev.system}".zeek-latest;
+            })
           ];
           config = {
             allowUnsupportedSystem = true;
@@ -53,6 +56,7 @@
       rec {
         packages = flake-utils.lib.flattenTree rec {
           zeek-release = pkgs.zeek-release;
+          zeek-latest = pkgs.zeek-latest;
           hardenedlinux-zeek-scripts = pkgs.hardenedlinux-zeek-scripts;
         };
 
@@ -63,19 +67,19 @@
         devShell = with pkgs; devshell.mkShell {
           imports = [
             (devshell.importTOML ./nix/devshell.toml)
+            (devshell.importTOML ./nix/zed.toml)
           ];
           packages = [
             zeek-release
             (pkgs.python3.withPackages (ps: with ps;[
               btest
             ]))
-            zed
           ];
           commands = [
             {
               name = pkgs.nvfetcher-bin.pname;
               help = pkgs.nvfetcher-bin.meta.description;
-              command = "cd $DEVSHELL_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml --no-output $@";
+              command = "cd $PRJ_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml $@";
             }
             {
               name = "zeek-with-dns";
