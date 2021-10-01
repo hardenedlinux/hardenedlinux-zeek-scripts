@@ -3,14 +3,14 @@
 {
   CVE-2021-38647 = {
     pname = "CVE-2021-38647";
-    version = "8e101d0c54402e7ff90ec052239ee7d7942698c2";
+    version = "5425f651990a7ac3c1462866fe2cdc50aed50565";
     src = fetchgit {
       url = "https://github.com/corelight/CVE-2021-38647";
-      rev = "8e101d0c54402e7ff90ec052239ee7d7942698c2";
+      rev = "5425f651990a7ac3c1462866fe2cdc50aed50565";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
-      sha256 = "0fqw4827wm33cadla5xr2axf32nq9nrzhnh87n0fv9axxbrza94n";
+      sha256 = "1f4zy5xc2jfb29w924ayq8mpc6j8hfq3h05hwkyxc36mb2mvbcci";
     };
   };
   dns-axfr = {
