@@ -99,14 +99,14 @@
   };
   zeek-known-hosts-with-dns = {
     pname = "zeek-known-hosts-with-dns";
-    version = "e04c4a7b40cf758656b6e54ea365f3adceacebf0";
+    version = "5ba64d528bdac204e1a09d70070733ff38b1b205";
     src = fetchgit {
       url = "https://github.com/dopheide-esnet/zeek-known-hosts-with-dns";
-      rev = "e04c4a7b40cf758656b6e54ea365f3adceacebf0";
+      rev = "5ba64d528bdac204e1a09d70070733ff38b1b205";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
-      sha256 = "1xfz13nbm1qwwn8lz37ddsz9jha54vibnpa95pvpb5cmczrmnxph";
+      sha256 = "13n2wjq2kbs0yf06xbja46lb1ws55dy2cc37n1k3fqkj75dscd53";
     };
   };
   zeek-os-package-tracking = {
