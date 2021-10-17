@@ -39,14 +39,14 @@
   };
   ja3 = {
     pname = "ja3";
-    version = "1ea6f1dee4e2668d376905c5443b835bca5d2fd7";
+    version = "382cd37ea2759bcfc5627d2d7071fe2466833e90";
     src = fetchgit {
       url = "https://github.com/salesforce/ja3";
-      rev = "1ea6f1dee4e2668d376905c5443b835bca5d2fd7";
+      rev = "382cd37ea2759bcfc5627d2d7071fe2466833e90";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
-      sha256 = "0985vq0aqy8ld66hi1p822qfalc6bn4vs06ykl8dhmvl028rpykm";
+      sha256 = "1wmxpy9ydz7prqny9lp2nhjrwszqbnyvvh4rbcx4015bwpij9fvy";
     };
   };
   scan-NG = {
