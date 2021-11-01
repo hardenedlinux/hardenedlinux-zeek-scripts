@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v14
         with:
-          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210823_af94b54/install
+          install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.5pre20211008_6bd74a6/install
           extra_nix_config: |
             experimental-features = nix-command flakes
             system-features = nixos-test benchmark big-parallel kvm recursive-nix
@@ -26,6 +26,8 @@ jobs:
 
       - name: Run nvfetcher
         run: nix -Lv develop --command nvfetcher -l changelog
+      - name: Nix Flake lock Update
+        run: nix -Lv flake update
 
       - name: Build Zeek With Nix
         run: |

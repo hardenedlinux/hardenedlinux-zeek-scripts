@@ -2,23 +2,22 @@
   description = "Hardenedlinux Zeek Scripts Repo";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/release-21.05";
-    flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
+    zeek2nix = { url = "github:hardenedlinux/zeek2nix"; };
 
-    zeek2nix.url = "github:hardenedlinux/zeek-nix";
     flake-utils.follows = "zeek2nix/flake-utils";
-    devshell-flake.follows = "zeek2nix/devshell-flake";
+    nixpkgs.follows = "zeek2nix/nixpkgs";
+    nixpkgs-hardenedlinux.follows = "zeek2nix/nixpkgs-hardenedlinux";
     nvfetcher.follows = "zeek2nix/nvfetcher";
-
-    nixpkgs-hardenedlinux.url = "github:hardenedlinux/nixpkgs-hardenedlinux";
-    gomod2nix.follows = "nixpkgs-hardenedlinux/gomod2nix";
+    devshell.follows = "zeek2nix/devshell";
+    flake-compat = { follows = "zeek2nix/flake-compat"; flake = false; };
+    gomod2nix.follows = "zeek2nix/nixpkgs-hardenedlinux/gomod2nix";
   };
   outputs =
     { self
     , nixpkgs
     , flake-utils
     , flake-compat
-    , devshell-flake
+    , devshell
     , nvfetcher
     , zeek2nix
     , nixpkgs-hardenedlinux
@@ -39,7 +38,7 @@
           inherit system;
           overlays = [
             self.overlay
-            devshell-flake.overlay
+            devshell.overlay
             nixpkgs-hardenedlinux.overlay
             nvfetcher.overlay
             gomod2nix.overlay
@@ -64,10 +63,10 @@
           inherit packages;
         };
 
-        devShell = with pkgs; devshell.mkShell {
+        devShell = with pkgs; pkgs.devshell.mkShell {
           imports = [
-            (devshell.importTOML ./nix/devshell.toml)
-            (devshell.importTOML ./nix/zed.toml)
+            (pkgs.devshell.importTOML ./nix/devshell.toml)
+            (pkgs.devshell.importTOML ./nix/zed.toml)
           ];
           packages = [
             zeek-release
@@ -79,7 +78,7 @@
             {
               name = pkgs.nvfetcher-bin.pname;
               help = pkgs.nvfetcher-bin.meta.description;
-              command = "cd $PRJ_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml $@";
+              command = "export NIX_PATH=nixpkgs=${pkgs.path}; cd $PRJ_ROOT/nix; ${pkgs.nvfetcher-bin}/bin/nvfetcher -c ./sources.toml $@";
             }
             {
               name = "zeek-with-dns";
