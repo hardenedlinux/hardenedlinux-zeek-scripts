@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v14
         with:
-          install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.5pre20211008_6bd74a6/install
+          install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.6.0pre20220106_f71d846/install
           extra_nix_config: |
             experimental-features = nix-command flakes
             system-features = nixos-test benchmark big-parallel kvm recursive-nix
@@ -25,7 +25,9 @@ jobs:
           nix -Lv flake check
 
       - name: Run nvfetcher
-        run: nix -Lv develop --command nvfetcher -l changelog
+        run: |
+          nix -Lv develop github:hardenedlinux/nixpkgs-hardenedlinux -c update nvfetcher -l changlog
+
       - name: Nix Flake lock Update
         run: nix -Lv flake update
 

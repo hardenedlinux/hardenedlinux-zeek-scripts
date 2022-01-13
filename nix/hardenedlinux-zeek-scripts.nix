@@ -1,4 +1,4 @@
-{ stdenv, lib, ripgrep, zeek-release, hardenedlinux-zeek-scripts-sources }:
+{ stdenvNoCC, lib, ripgrep, zeek-release, hardenedlinux-zeek-scripts-sources }:
 let
   loadScripts = lib.concatStringsSep "\n" (map (f: "@load ${hardenedlinux-zeek-scripts-sources.${f}.src}/scripts") scripts);
   scripts = [
@@ -11,7 +11,7 @@ let
     "sip-attacks"
   ];
 in
-stdenv.mkDerivation rec {
+stdenvNoCC.mkDerivation rec {
   src = ../scripts;
   name = "hardenedlinux-zeek-script";
   phases = [ "installPhase" ];
