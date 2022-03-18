@@ -11,6 +11,6 @@ module VLANLocation;
 
 # This is sample data and must be replaced with actual information
 redef vlanlist += {
-[1001] = [$description="Gigamon Port 2/1/x1",$location="wifi-upper-level"],
-[1002] = [$description="Gigamon Port 2/1/x2",$location="wifi-lower-level"],
+	[1001] = [$description="Gigamon Port 2/1/x1", $location="wifi-upper-level"],
+	[1002] = [$description="Gigamon Port 2/1/x2", $location="wifi-lower-level"],
 };

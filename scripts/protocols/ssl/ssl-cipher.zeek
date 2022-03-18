@@ -23,51 +23,52 @@ export {
 		client_curves: set[string] &log &optional &default=string_set();
 		extensions: set[string] &log &optional &default=string_set();
 		point_formats: set[string] &log &optional &default=string_set();
-	  };
-  }
-event ssl_client_hello (c: connection , version: count , record_version: count , possible_ts: time , client_random: string , session_id: string , ciphers: index_vec , comp_methods: index_vec )
-  {
-	if (!c?$ssl)
+	};
+}
+event ssl_client_hello(c: connection, version: count, record_version: count,
+    possible_ts: time, client_random: string, session_id: string,
+    ciphers: index_vec, comp_methods: index_vec)
+{
+	if ( ! c?$ssl )
 		return;
-    if (|ciphers| == 0)
-      return;
+	if ( |ciphers| == 0 )
+		return;
 
-      for (cipher in ciphers) {
-        add c$ssl$client_ciphers[SSL::cipher_desc[ciphers[cipher]]];
-        }
-      
-      }
+	for ( cipher in ciphers ) {
+		add c$ssl$client_ciphers[SSL::cipher_desc[ciphers[cipher]]];
+	}
+}
 
-
-
-    event ssl_extension (c: connection, is_orig: bool, code: count, val: string)
-  {
-  if (!c?$ssl)
-    return;
-
-    add c$ssl$extensions[SSL::extensions[code]];
-    }
-
-  event ssl_extension_elliptic_curves (c: connection, is_orig: bool, curves: index_vec)
+event ssl_extension(c: connection, is_orig: bool, code: count, val: string)
 {
-if (!c?$ssl)
-  return;
-  if (|curves| == 0)
-    return;
+	if ( ! c?$ssl )
+		return;
 
-    for (curve in curves) {
-      add c$ssl$client_curves[ec_curves[curves[curve]]];
-      }
-    }
+	add c$ssl$extensions[SSL::extensions[code]];
+}
 
-  event ssl_extension_ec_point_formats(c: connection, is_orig: bool, point_formats: index_vec)
+event ssl_extension_elliptic_curves(c: connection, is_orig: bool,
+    curves: index_vec)
 {
-if (!c?$ssl)
-  return;
-  if (|point_formats| == 0)
-    return;
+	if ( ! c?$ssl )
+		return;
+	if ( |curves| == 0 )
+		return;
 
-    for (point in point_formats) {
-      add c$ssl$point_formats[ec_point_formats[point_formats[point]]];
-      }
-    }
+	for ( curve in curves ) {
+		add c$ssl$client_curves[ec_curves[curves[curve]]];
+	}
+}
+
+event ssl_extension_ec_point_formats(c: connection, is_orig: bool,
+    point_formats: index_vec)
+{
+	if ( ! c?$ssl )
+		return;
+	if ( |point_formats| == 0 )
+		return;
+
+	for ( point in point_formats ) {
+		add c$ssl$point_formats[ec_point_formats[point_formats[point]]];
+	}
+}

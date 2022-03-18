@@ -15,6 +15,7 @@
   inputs = {
     flake-compat.flake = false;
     nixpkgs.follows = "nixpkgs-hardenedlinux/nixpkgs";
+    cells.url = "/home/gtrun/ghq/github.com/GTrunSec/DevSecOps-cells";
   };
   outputs =
     { self
@@ -23,8 +24,9 @@
     , flake-compat
     , devshell
     , zeek2nix
+    , cells
     , nixpkgs-hardenedlinux
-    }:
+    }@inputs:
     {
       overlay = final: prev:
         {
@@ -36,52 +38,38 @@
     (flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ]
       (system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [
+          pkgs = inputs.nixpkgs.legacyPackages."${system}".appendOverlays [
             self.overlay
-            devshell.overlay
             (final: prev: {
               inherit (zeek2nix.packages."${prev.system}")
                 zeek-release
                 zeek-latest;
               inherit (nixpkgs-hardenedlinux.packages."${prev.system}")
                 btest
-                zed;
+                zed
+              ;
             })
           ];
-          config = {
-            allowUnsupportedSystem = true;
-          };
-        };
+          devshell = inputs.devshell.legacyPackages.${system};
       in
       rec {
         packages = flake-utils.lib.flattenTree rec {
-          zeek-release = pkgs.zeek-release;
-          zeek-latest = pkgs.zeek-latest;
-          hardenedlinux-zeek-scripts = pkgs.hardenedlinux-zeek-scripts;
+          inherit (pkgs) hardenedlinux-zeek-scripts;
         };
 
-        hydraJobs = {
-          inherit packages;
-        };
-
-        devShell = with pkgs; pkgs.devshell.mkShell {
+        devShell = devshell.mkShell {
           imports = [
-            (pkgs.devshell.importTOML ./nix/devshell.toml)
-            (pkgs.devshell.importTOML ./nix/zed.toml)
+            (devshell.importTOML ./nix/devshell.toml)
+            (devshell.importTOML ./nix/zed.toml)
+            inputs.cells.devshellProfiles.${system}.tenzir-action
+            inputs.cells.devshellProfiles.${system}.common
           ];
-          packages = [
-            zeek-release
-            (pkgs.python3.withPackages (ps: with ps;[
-              btest
-            ]))
-          ];
+          packages = [ pkgs.zed ];
           commands = [
             {
               name = "zeek-with-dns";
               help = "launch zeek with protocols/dns scirpts";
-              command = "${zeek-release}/bin/zeek ${hardenedlinux-zeek-scripts}/protocols/dns $@";
+              command = "${pkgs.zeek-release}/bin/zeek ${pkgs.hardenedlinux-zeek-scripts}/protocols/dns $@";
             }
           ];
         };

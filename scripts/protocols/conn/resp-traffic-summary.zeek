@@ -1,4 +1,3 @@
-
 # Written by Bob Rotsted
 # Copyright Reservoir Labs, 2015.
 #
@@ -18,62 +17,63 @@
 module RespTrafficSummary;
 
 export {
+	global epoch: interval = 60 min &redef;
+	redef enum Log::ID += {
+		LOG
+	};
 
-    global epoch: interval = 60min &redef;
-    redef enum Log::ID += { LOG };
+	type Info: record {
+		start_time: string &log;
+		traffic_breakdown: string &log;
+	} &redef;
 
-    type Info: record {
-        start_time: string &log;
-        traffic_breakdown: string &log;
-    } &redef;
-
-    global log_resp_traffic_summary: event(rec: Info);
-    global bytes_per_proto: table[string] of double = table();
-
-
+	global log_resp_traffic_summary: event(rec: Info);
+	global bytes_per_proto: table[string] of double = table();
 }
 
 event zeek_init()
-    {
+{
+	local rec: RespTrafficSummary::Info;
+	Log::create_stream(RespTrafficSummary::LOG, [
+	    $columns=Info,
+	    $ev=log_resp_traffic_summary]);
 
-    local rec: RespTrafficSummary::Info;
-    Log::create_stream(RespTrafficSummary::LOG, [$columns=Info, $ev=log_resp_traffic_summary]);
+	local r1 = SumStats::Reducer(
+	    $stream="resp.traffic.summary",
+	    $apply=set(SumStats::SUM));
+	SumStats::create([
+	    $name="resp.traffic.summary",
+	    $epoch=epoch,
+	    $reducers=set(r1),
+	    $epoch_result (ts: time, key: SumStats::Key, result: SumStats::Result) = {
+		local r = result["resp.traffic.summary"];
 
-    local r1 = SumStats::Reducer($stream="resp.traffic.summary", $apply=set(SumStats::SUM));
-    SumStats::create([$name="resp.traffic.summary",
-                      $epoch=epoch,
-                      $reducers=set(r1),
-                      $epoch_result(ts: time, key: SumStats::Key, result: SumStats::Result) =
-                        {
-                        local r = result["resp.traffic.summary"];
+		bytes_per_proto[key$str] = r$sum;
+	}, $epoch_finished (ts: time) = {
+		local sum: double = 0.0;
+		local breakdown: string = "";
 
-                        bytes_per_proto[key$str] = r$sum;
+		for ( proto in bytes_per_proto )
+			sum += bytes_per_proto[proto];
 
-                        },
-                      $epoch_finished(ts: time) =
-                      {
+		for ( proto in bytes_per_proto ) {
+			local percentage: double = ( bytes_per_proto[proto] / sum ) * 100;
+			breakdown = fmt("%s %s: %s%s, ", breakdown, to_upper(proto), percentage, "%");
+		}
 
-                        local sum: double = 0.0;
-                        local breakdown: string = "";
-
-                        for ( proto in bytes_per_proto )
-                            sum += bytes_per_proto[proto];
-
-                        for ( proto in bytes_per_proto ) {
-                            local percentage: double = ( bytes_per_proto[proto] / sum ) * 100;
-                            breakdown = fmt("%s %s: %s%s, ", breakdown, to_upper(proto), percentage,"%");
-                        }
-
-                        Log::write(RespTrafficSummary::LOG, [$start_time= strftime("%c", ts - epoch ), $traffic_breakdown=breakdown]);
-                        bytes_per_proto = table();
-                      }
-                        ]);
-    }
+		Log::write(RespTrafficSummary::LOG, [
+		    $start_time=strftime("%c", ts - epoch),
+		    $traffic_breakdown=breakdown]);
+		bytes_per_proto = table();
+	}]);
+}
 
 event connection_state_remove(c: connection)
-    {
-        if ( ! c$conn?$service )
-            return;
+{
+	if ( ! c$conn?$service )
+		return;
 
-        SumStats::observe("resp.traffic.summary", [$str=c$conn$service], [$num=c$resp$size]);
-    }
+	SumStats::observe("resp.traffic.summary", [
+	    $str=c$conn$service], [
+	    $num=c$resp$size]);
+}

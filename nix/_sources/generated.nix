@@ -3,13 +3,13 @@
 {
   CVE-2021-38647 = {
     pname = "CVE-2021-38647";
-    version = "5425f651990a7ac3c1462866fe2cdc50aed50565";
+    version = "d9604a8cf396daa92bfe27689ce74e84402e8bdd";
     src = fetchFromGitHub ({
       owner = "corelight";
       repo = "CVE-2021-38647";
-      rev = "5425f651990a7ac3c1462866fe2cdc50aed50565";
+      rev = "d9604a8cf396daa92bfe27689ce74e84402e8bdd";
       fetchSubmodules = false;
-      sha256 = "sha256-kbG1q1jVDNb95LAAOLCDSBp2K8JeEZF4EstJwXrxn7g=";
+      sha256 = "sha256-bhrIwRwz9JOOd0E9VXchdX8jIMShgxwo1BDEhBdcISc=";
     });
   };
   dns-axfr = {
@@ -80,13 +80,13 @@
   };
   zeek-domain-tld = {
     pname = "zeek-domain-tld";
-    version = "6348921402150ca6571c25c71719c0e1e368f86f";
+    version = "9a77e990c21427c1415c0b7222c49abae786bea3";
     src = fetchFromGitHub ({
       owner = "sethhall";
       repo = "domain-tld";
-      rev = "6348921402150ca6571c25c71719c0e1e368f86f";
+      rev = "9a77e990c21427c1415c0b7222c49abae786bea3";
       fetchSubmodules = false;
-      sha256 = "sha256-VCh27WnA9zZsbxx/G9TQgM+Oi0dZP79JaqMVe9OlEQk=";
+      sha256 = "sha256-vbN2z2Fncopw0mohXKWzy4F31kjRla3MEYWpU0lbrmA=";
     });
   };
   zeek-known-hosts-with-dns = {
@@ -102,13 +102,13 @@
   };
   zeek-os-package-tracking = {
     pname = "zeek-os-package-tracking";
-    version = "5345b12e6ba2cf1990fc5510aa649a6c234b82bb";
+    version = "0424e312013c0f295193e5762eb6672ff6e54d19";
     src = fetchFromGitHub ({
       owner = "0xxon";
       repo = "zeek-os-package-tracking";
-      rev = "5345b12e6ba2cf1990fc5510aa649a6c234b82bb";
+      rev = "0424e312013c0f295193e5762eb6672ff6e54d19";
       fetchSubmodules = false;
-      sha256 = "sha256-v6ohro7aTgsJoaaDAUqkHCbYKi1+XhLIhuv8YE62Tts=";
+      sha256 = "sha256-HaZ/r6K8XoxlUSBul9R/xb2gWnFnBmWiaskyD0cONQo=";
     });
   };
   zeek-sumstats-counttable = {

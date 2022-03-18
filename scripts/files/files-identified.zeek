@@ -11,44 +11,37 @@ export {
 		## Ports used on the server side.
 		file_ident_ports: set[count] &optional &log;
 	};
-	
+
 	## Files that are to have descriptions included in the
 	## log and filtered into the new log.
-	const identified_files = /application\/x-dosexec/
-	                       | /application\/vnd.ms-cab-compressed/
-	                       | /application\/x-gzip/
-	                       | /application\/bzip2/
-	                       | /application\/zip/
-	                       | /application\/java-byte-code/
-	                       | /application\/x-java-applet/
-	                       | /application\/jar/
-	                       | /application\/x-script/
-	                       | /application\/pdf/
-	                       | /application\/x-executable/;
+	const identified_files = /application\/x-dosexec/ |
+	    /application\/vnd.ms-cab-compressed/ | /application\/x-gzip/ |
+	    /application\/bzip2/ | /application\/zip/ |
+	    /application\/java-byte-code/ | /application\/x-java-applet/ |
+	    /application\/jar/ | /application\/x-script/ | /application\/pdf/ |
+	    /application\/x-executable/;
 }
 
 event zeek_init()
-	{
-	Log::add_filter(Files::LOG, [$name = "files-identified",
-	                             $path = "files_identified",
-	                             $pred(rec: Files::Info) = 
-	                             	{ return rec?$file_ident_descr; },
-	                             $include = set("ts", "conn_uids", "fuid", "tx_hosts", "rx_hosts", "source", "mime_type", "filename", "file_ident_descr", "file_ident_ports", "seen_bytes", "total_bytes", "md5", "sha1")
-	                             ]);
+{
+	Log::add_filter(Files::LOG, [
+	    $name="files-identified",
+	    $path="files_identified",
+	    $pred (rec: Files::Info) = {
+		return rec?$file_ident_descr;
+	},
+	    $include=set("ts", "conn_uids", "fuid", "tx_hosts", "rx_hosts", "source", "mime_type", "filename", "file_ident_descr", "file_ident_ports", "seen_bytes", "total_bytes", "md5", "sha1")]);
+}
 
-	}
-
-event  file_sniff(f: fa_file, meta: fa_metadata) &priority=-3
-	{
-	if ( meta?$mime_type && identified_files in meta$mime_type )
-		{
+event file_sniff(f: fa_file, meta: fa_metadata) &priority=-3
+{
+	if ( meta?$mime_type && identified_files in meta$mime_type ) {
 		f$info$file_ident_descr = Files::describe(f);
-		for ( id in f$conns )
-			{
+		for ( id in f$conns ) {
 			if ( ! f$info?$file_ident_ports )
 				f$info$file_ident_ports = set(port_to_count(id$resp_p));
 			else
 				add f$info$file_ident_ports[port_to_count(id$resp_p)];
-			}
 		}
 	}
+}

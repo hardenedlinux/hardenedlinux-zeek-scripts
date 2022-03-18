@@ -1,2 +1,1 @@
-@load ./disable_analyzers.zeek
-# @load ./input-test.zeek
+@load ./disable_analyzers.zeek# @load ./input-test.zeek

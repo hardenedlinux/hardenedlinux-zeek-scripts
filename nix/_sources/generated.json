@@ -1,0 +1,222 @@
+{
+    "sip-attacks": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "sip-attacks",
+        "version": "1b8c5feb73a732e2ddd8419159f1cbd24c8b9f69",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "initconf",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "sip-attacks",
+            "type": "github",
+            "sha256": "sha256-PesuayIue+KaoGpsNYgHkUTgtjFoDd8qT38DilhtO9k=",
+            "rev": "1b8c5feb73a732e2ddd8419159f1cbd24c8b9f69"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "CVE-2021-38647": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "CVE-2021-38647",
+        "version": "d9604a8cf396daa92bfe27689ce74e84402e8bdd",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "corelight",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "CVE-2021-38647",
+            "type": "github",
+            "sha256": "sha256-bhrIwRwz9JOOd0E9VXchdX8jIMShgxwo1BDEhBdcISc=",
+            "rev": "d9604a8cf396daa92bfe27689ce74e84402e8bdd"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "zeek-known-hosts-with-dns": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "zeek-known-hosts-with-dns",
+        "version": "5ba64d528bdac204e1a09d70070733ff38b1b205",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "dopheide-esnet",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "zeek-known-hosts-with-dns",
+            "type": "github",
+            "sha256": "sha256-ozSmWzlyYjdmsGcwJnwrRfOwqCFKrm6A80CvKbDkwo4=",
+            "rev": "5ba64d528bdac204e1a09d70070733ff38b1b205"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "ja3": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "ja3",
+        "version": "382cd37ea2759bcfc5627d2d7071fe2466833e90",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "salesforce",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "ja3",
+            "type": "github",
+            "sha256": "sha256-frsk4+WrBEA6W5nAvb1d+GueJbTi0uQtzvf85pO/vfI=",
+            "rev": "382cd37ea2759bcfc5627d2d7071fe2466833e90"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "zeek-sumstats-counttable": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "zeek-sumstats-counttable",
+        "version": "4340348f23b5e807f2f8eae835eb02170efee347",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "0xxon",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "zeek-sumstats-counttable",
+            "type": "github",
+            "sha256": "sha256-W7G5uon47mi7qk0EKVCHSCItrDvT11IxNlKwz5mW/lk=",
+            "rev": "4340348f23b5e807f2f8eae835eb02170efee347"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "top-dns": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "top-dns",
+        "version": "d08b1a5665e47ff983debe5a85c0dc8b52aee019",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "corelight",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "top-dns",
+            "type": "github",
+            "sha256": "sha256-ZMtwwaJO2TSEtyW7aqpFhORPrUEQosZ4lwVuqmS1hpM=",
+            "rev": "d08b1a5665e47ff983debe5a85c0dc8b52aee019"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "dns-tunnels": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "dns-tunnels",
+        "version": "4180a7b2606d11fadb64878d653739a9815ce359",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "hhzzk",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "dns-tunnels",
+            "type": "github",
+            "sha256": "sha256-LAptyu4Cm4yhY+NoRQT4wJaVadQdXXMH/6FSScO7qnQ=",
+            "rev": "4180a7b2606d11fadb64878d653739a9815ce359"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "zeek-domain-tld": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "zeek-domain-tld",
+        "version": "9a77e990c21427c1415c0b7222c49abae786bea3",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "sethhall",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "domain-tld",
+            "type": "github",
+            "sha256": "sha256-vbN2z2Fncopw0mohXKWzy4F31kjRla3MEYWpU0lbrmA=",
+            "rev": "9a77e990c21427c1415c0b7222c49abae786bea3"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "zeek-os-package-tracking": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "zeek-os-package-tracking",
+        "version": "0424e312013c0f295193e5762eb6672ff6e54d19",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "0xxon",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "zeek-os-package-tracking",
+            "type": "github",
+            "sha256": "sha256-HaZ/r6K8XoxlUSBul9R/xb2gWnFnBmWiaskyD0cONQo=",
+            "rev": "0424e312013c0f295193e5762eb6672ff6e54d19"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "scan-NG": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "scan-NG",
+        "version": "80b0c3b9857336e0417c6bc7f92938445b9df48f",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "initconf",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "scan-NG",
+            "type": "github",
+            "sha256": "sha256-phIAcrRVCoNHmC/edt3/R4tWRxWhcKtOjKImp8USTm4=",
+            "rev": "80b0c3b9857336e0417c6bc7f92938445b9df48f"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    },
+    "dns-axfr": {
+        "pinned": false,
+        "cargoLock": null,
+        "name": "dns-axfr",
+        "version": "fda4b70516f576a698e0f0f6f1f1e62fc98d258f",
+        "passthru": null,
+        "src": {
+            "deepClone": false,
+            "leaveDotGit": false,
+            "owner": "srozb",
+            "fetchSubmodules": false,
+            "name": null,
+            "repo": "dns_axfr",
+            "type": "github",
+            "sha256": "sha256-bktZeB+lQCHW9F8Vfmc8nLWcD///0izzXo6WtU/syEk=",
+            "rev": "fda4b70516f576a698e0f0f6f1f1e62fc98d258f"
+        },
+        "extract": null,
+        "rustGitDeps": null
+    }
+}

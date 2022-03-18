@@ -1,7 +1,4 @@
 [devshell]
-packages = [ "zed" ]
-
-
 
 [[commands]]
 name = "zq-text"
