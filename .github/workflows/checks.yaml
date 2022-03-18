@@ -11,54 +11,24 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: cachix/install-nix-action@v16
-        with:
-          install_url: https://github.com/numtide/nix-unstable-installer/releases/download/nix-2.6.0pre20220106_f71d846/install
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            system-features = nixos-test benchmark big-parallel kvm recursive-nix
-            extra-substituters = https://zeek.cachix.org
-            extra-trusted-public-keys = zeek.cachix.org-1:Jv0hB/P5eF7RQUZgSQiVqzqzgweP29YIwpSiukGlDWQ=
+      - uses: actions/checkout@v2
+      - uses: gtrunsec/SOC-action@main
+        with: # options
+        run-command: |
+          echo hello SOC Action!
+        zeek-lint: ./scripts
 
-      - name: Nix Flake Check
-        run: |
-          nix -Lv flake check
+      - name: Nix Flake show
+        run: nix -Lv flake show
 
       - name: Run nvfetcher
-        run: |
-          nix -Lv develop github:hardenedlinux/nixpkgs-hardenedlinux -c update nvfetcher -l changlog
+        run: nix -Lv develop -c run-nvfetcher
 
       - name: Nix Flake lock Update
         run: nix -Lv flake update
 
-      - name: Build Zeek With Nix
-        run: |
-          nix -Lv build ./#zeek-release
-          nix -Lv develop -c zeek --version
-
-      - name: Check Zeek Plugins
-        run: nix develop -c zeek -N
-
-      - name: Check Query Script
-        run: |
-          nix -Lv develop -c zeek scripts/zeek-query.zeek >/dev/null 2>&1
-
       - name: Build hardenedlinux-zeek-scripts
-        run: |
-          nix -Lv develop -c hardenedlinux-zeek-scripts
-          cat ./result/__load__.zeek
-
-      - name: COMMIT_MSG
-        run: |
-          changlog=$(find . -type f -name "changelog")
-          if [[ ! -z "$(cat $changlog)" ]]; then
-          echo "COMMIT_MSG<<EOF" >>$GITHUB_ENV
-          echo "$(cat $changlog)" >>$GITHUB_ENV
-          echo "EOF" >>$GITHUB_ENV
-          rm -rf $changlog
-          else
-          rm -rf $changlog
-          fi
+        run: nix -Lv develop -c hardenedlinux-zeek-scripts
 
       - name: Commit changes
         if: ${{ env.COMMIT_MSG != null }}
