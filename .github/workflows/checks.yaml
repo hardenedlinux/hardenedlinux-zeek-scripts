@@ -11,12 +11,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v2
       - uses: gtrunsec/SOC-action@main
-        with: # options
-        run-command: |
-          echo hello SOC Action!
-        zeek-lint: ./scripts
+        with:
+          run-command: |
+            echo hello SOC Action!
+          zeek-lint: ./scripts
 
       - name: Nix Flake show
         run: nix -Lv flake show

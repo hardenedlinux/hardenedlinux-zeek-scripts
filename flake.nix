@@ -11,48 +11,46 @@
     ];
   };
 
-
   inputs = {
     flake-compat.flake = false;
-    nixpkgs.follows = "nixpkgs-hardenedlinux/nixpkgs";
-    cells.url = "/home/gtrun/ghq/github.com/GTrunSec/DevSecOps-cells";
+    cells.url = "github:GTrunSec/DevSecOps-Cells-Lab";
   };
-  outputs =
-    { self
-    , nixpkgs
-    , flake-utils
-    , flake-compat
-    , devshell
-    , zeek2nix
-    , cells
-    , nixpkgs-hardenedlinux
-    }@inputs:
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    flake-compat,
+    devshell,
+    zeek2nix,
+    cells,
+    nixpkgs-hardenedlinux,
+  } @ inputs:
     {
-      overlay = final: prev:
-        {
-          hardenedlinux-zeek-scripts-sources = prev.callPackage ./nix/_sources/generated.nix { };
-          hardenedlinux-zeek-scripts = prev.callPackage ./nix/hardenedlinux-zeek-scripts.nix { };
-        };
+      overlay = final: prev: {
+        hardenedlinux-zeek-scripts-sources = prev.callPackage ./nix/_sources/generated.nix {};
+        hardenedlinux-zeek-scripts = prev.callPackage ./nix/hardenedlinux-zeek-scripts.nix {};
+      };
     }
-    //
-    (flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ]
-      (system:
-      let
-          pkgs = inputs.nixpkgs.legacyPackages."${system}".appendOverlays [
-            self.overlay
-            (final: prev: {
-              inherit (zeek2nix.packages."${prev.system}")
-                zeek-release
-                zeek-latest;
-              inherit (nixpkgs-hardenedlinux.packages."${prev.system}")
-                btest
-                zed
+    // (
+      flake-utils.lib.eachSystem ["x86_64-linux" "x86_64-darwin"]
+      (system: let
+        pkgs = inputs.nixpkgs.legacyPackages."${system}".appendOverlays [
+          self.overlay
+          (final: prev: {
+            inherit
+              (zeek2nix.packages."${prev.system}")
+              zeek-release
+              zeek-latest
               ;
-            })
-          ];
-          devshell = inputs.devshell.legacyPackages.${system};
-      in
-      rec {
+            inherit
+              (nixpkgs-hardenedlinux.packages."${prev.system}")
+              btest
+              zed
+              ;
+          })
+        ];
+        devshell = inputs.devshell.legacyPackages.${system};
+      in rec {
         packages = flake-utils.lib.flattenTree rec {
           inherit (pkgs) hardenedlinux-zeek-scripts;
         };
@@ -61,10 +59,10 @@
           imports = [
             (devshell.importTOML ./nix/devshell.toml)
             (devshell.importTOML ./nix/zed.toml)
-            inputs.cells.devshellProfiles.${system}.tenzir-action
-            inputs.cells.devshellProfiles.${system}.common
+            inputs.cells.${system}.soc-action.devshellProfiles.default
+            inputs.cells.${system}.update.devshellProfiles.default
           ];
-          packages = [ pkgs.zed ];
+          packages = [pkgs.zed];
           commands = [
             {
               name = "zeek-with-dns";
