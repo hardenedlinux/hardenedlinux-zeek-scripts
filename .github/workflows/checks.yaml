@@ -13,8 +13,7 @@ jobs:
           fetch-depth: 0
       - uses: gtrunsec/SOC-action@main
         with:
-          run-command: |
-            echo hello SOC Action!
+          run-command: echo hello SOC Action!
           zeek-lint: ./scripts
 
       - name: Nix Flake show
